@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京旅行攻略 | 2026.4.30 - 5.3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: 'fbd8f39b3f81d57218c6f3548e561119',
+        }
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=0ea0b8be0dd34998dfb2d9600f6d15cb&plugin=AMap.Driving,AMap.Walking,AMap.Transfer"></script>
+    <script>
+        async function fetchWeather() {
+            try {
+                const response = await fetch('/api/weather');
+                const data = await response.json();
+                if (data.status === '1' && data.lives.length > 0) {
+                    const weather = data.lives[0];
+                    const weatherContainer = document.querySelector('.hero-weather');
+                    if (weatherContainer) {
+                        weatherContainer.innerHTML = `
+                            <span class="weather-item">🌤️ ${weather.weather}</span>
+                            <span class="weather-item">🌡️ ${weather.temperature}°C</span>
+                            <span class="weather-item">💨 ${weather.winddirection}风 ${weather.windpower}级</span>
+                        `;
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to fetch weather data:', err);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', fetchWeather);
+    </script>
+    <style>
+        :root {
+            --ink: #1c1917;
+            --paper: #faf9f7;
+            --cream: #f5f2ed;
+            --accent: #c2410c;
+            --gold: #d97706;
+            --teal: #0f766e;
+            --rose: #be123c;
+            --slate: #475569;
+            --stone: #78716c;
+            --border: #e7e5e4;
+            --subway: #3b82f6;
+            --taxi: #f59e0b;
+            --walk: #10b981;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .hero {
+            position: relative;
+            background: var(--ink);
+            padding: 1.2rem 2rem;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(194, 65, 12, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(15, 118, 110, 0.2) 0%, transparent 50%);
+        }
+
+        .hero-content { position: relative; max-width: 1400px; margin: 0 auto; }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem; font-weight: 600; color: white;
+            line-height: 1.3; margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 0.85rem; color: rgba(255,255,255,0.5);
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-weather {
+            display: flex; gap: 1rem; align-items: center;
+            font-size: 0.8rem; color: rgba(255,255,255,0.4);
+            margin-bottom: 0.6rem;
+        }
+        .weather-item { display: flex; align-items: center; gap: 0.3rem; }
+
+        .hero-stats { display: flex; gap: 1.5rem; }
+        .stat { display: flex; flex-direction: column; }
+        .stat-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem; font-weight: 600; color: white;
+        }
+        .stat-label { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+
+        .nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; align-items: center; gap: 0.5rem;
+            overflow-x: auto; padding: 0.5rem 0; scrollbar-width: none;
+        }
+        .nav-inner::-webkit-scrollbar { display: none; }
+
+        .nav-btn {
+            padding: 0.5rem 1rem; border: none; background: transparent;
+            cursor: pointer; transition: all 0.2s ease;
+            border-radius: 8px; font-size: 0.9rem; font-weight: 500;
+            white-space: nowrap; color: var(--stone);
+        }
+        .nav-btn:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+        .nav-btn.active { background: var(--ink); color: white; }
+
+        .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        .day-section { display: none; animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .day-section.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .day-header { margin-bottom: 1rem; display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+        .day-number {
+            font-size: 0.85rem;
+            font-weight: 600; color: var(--ink);
+        }
+        .day-tips {
+            font-size: 0.85rem; color: var(--stone);
+            padding: 0.2rem 0.6rem; background: var(--cream); border-radius: 4px;
+        }
+
+        .map-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; margin-bottom: 3rem; }
+
+        .map-frame {
+            position: relative; background: var(--cream); border-radius: 16px;
+            overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+        }
+
+        .map-legend {
+            position: absolute; top: 12px; left: 12px; z-index: 10;
+            background: white; border-radius: 10px; padding: 10px 14px;
+            box-shadow: var(--shadow-md); display: flex; gap: 12px;
+            font-size: 0.75rem; font-weight: 500;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-line { width: 20px; height: 4px; border-radius: 2px; }
+        .legend-line.subway { background: var(--subway); }
+        .legend-line.taxi { background: var(--taxi); border: 1px dashed rgba(0,0,0,0.2); }
+        .legend-line.walk { background: var(--walk); height: 3px; border: 1px dashed rgba(0,0,0,0.2); }
+
+        .amap-container { width: 100%; height: 550px; }
+
+        .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .card {
+            background: white; border-radius: 16px; padding: 1.5rem;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+        .card-label {
+            font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--stone); margin-bottom: 0.5rem;
+        }
+
+        .transport-section { margin-bottom: 1.2rem; }
+        .transport-section-title {
+            font-size: 0.8rem; font-weight: 600; color: var(--ink);
+            margin-bottom: 0.6rem; padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .transport-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .transport-item {
+            display: flex; align-items: center; gap: 0.8rem;
+            padding: 0.8rem; background: var(--cream); border-radius: 10px;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;
+            border: 2px solid transparent; position: relative;
+        }
+        .transport-item:hover {
+            background: white; transform: translateX(4px); box-shadow: var(--shadow-sm);
+        }
+        .transport-item.active { background: white; box-shadow: var(--shadow-md); transform: translateX(4px); }
+        .transport-item.active.subway { border-color: var(--subway); }
+        .transport-item.active.taxi { border-color: var(--taxi); }
+        .transport-item.active.walk { border-color: var(--walk); }
+
+        .transport-item .route-label {
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+            font-size: 0.65rem; font-weight: 600; color: var(--accent);
+            background: rgba(194, 65, 12, 0.1); padding: 2px 6px;
+            border-radius: 4px; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .transport-item:hover .route-label, .transport-item.active .route-label { opacity: 1; }
+
+        .transport-item.recommended::after {
+            content: '推荐';
+            position: absolute;
+            right: 8px;
+            top: -8px;
+            background: var(--teal);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .transport-icon {
+            width: 32px; height: 32px; border-radius: 8px; background: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; box-shadow: var(--shadow-sm); flex-shrink: 0;
+        }
+        .transport-text { flex: 1; }
+
+        .transport-type-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 0.7rem; font-weight: 700; color: white;
+        }
+        .badge-subway { background: var(--subway); }
+        .badge-taxi { background: var(--taxi); }
+        .badge-walk { background: var(--walk); }
+
+        .route-detail {
+            font-size: 0.75rem;
+            color: #78716c;
+            margin-top: 4px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .route-detail span {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .concert-card {
+            background: linear-gradient(135deg, var(--ink), #292524); color: white; border: none;
+        }
+        .concert-card .card-label { color: rgba(255,255,255,0.5); }
+        .concert-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: var(--accent); padding: 0.3rem 0.8rem;
+            border-radius: 100px; font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.05em; margin-bottom: 1rem;
+        }
+        .concert-title {
+            font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
+            font-weight: 600; margin-bottom: 0.5rem;
+        }
+        .concert-meta { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+        .concert-meta span { display: flex; align-items: center; gap: 0.3rem; }
+
+        .price-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+        .price-tag { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.8rem; background: var(--cream); border-radius: 10px; }
+        .price-name { font-size: 0.75rem; color: var(--stone); }
+        .price-value { font-weight: 600; color: var(--ink); font-size: 0.9rem; }
+        .price-free { color: var(--teal); }
+        .price-booked { color: var(--accent); }
+
+        .tip-card {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-left: 4px solid var(--gold);
+        }
+        .tip-card .card-label { color: var(--gold); }
+        .tip-text { font-size: 0.85rem; color: #78350f; line-height: 1.6; }
+
+        .timeline { position: relative; padding-left: 2rem; margin-top: 2rem; }
+        .timeline::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 2px; background: linear-gradient(to bottom, var(--accent), var(--gold));
+        }
+        .timeline-item {
+            position: relative; padding-bottom: 1.5rem;
+            animation: fadeInLeft 0.5s ease forwards; opacity: 0;
+        }
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-item::before {
+            content: ''; position: absolute; left: -2rem; top: 0.4rem;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); transform: translateX(-4px);
+            box-shadow: 0 0 0 4px var(--paper);
+        }
+        .timeline-time {
+            font-size: 0.75rem; font-weight: 600; color: var(--stone);
+            letter-spacing: 0.05em; margin-bottom: 0.2rem;
+        }
+        .timeline-content { font-size: 0.9rem; }
+        .timeline-item.clickable { cursor: pointer; }
+        .timeline-item.clickable .timeline-content { color: var(--accent); font-weight: 500; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+        .timeline-item.clickable:hover .timeline-content { color: var(--ink); }
+
+        .spot-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-start;
+            padding: 2rem; overflow-y: auto;
+        }
+        .spot-modal-overlay.active { display: flex; }
+        .spot-modal {
+            background: white; border-radius: 16px; max-width: 700px; width: 100%;
+            box-shadow: var(--shadow-lg); margin: 2rem auto; animation: slideUp 0.3s ease;
+        }
+        .spot-modal-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--border);
+        }
+        .spot-modal-title { font-size: 1.3rem; font-weight: 700; color: var(--ink); }
+        .spot-modal-close {
+            background: none; border: none; font-size: 1.5rem; cursor: pointer;
+            color: var(--stone); padding: 0; line-height: 1;
+        }
+        .spot-modal-close:hover { color: var(--ink); }
+        .spot-modal-body { padding: 1.5rem; }
+        .spot-info-section { margin-bottom: 1.5rem; }
+        .spot-info-section:last-child { margin-bottom: 0; }
+        .spot-info-title {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--stone); margin-bottom: 0.6rem;
+            padding-bottom: 0.3rem; border-bottom: 1px solid var(--border);
+        }
+        .spot-info-content { font-size: 0.88rem; color: var(--ink); line-height: 1.7; }
+        .spot-info-content p { margin-bottom: 0.5rem; }
+        .spot-info-content p:last-child { margin-bottom: 0; }
+        .spot-route { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .spot-route-step {
+            background: var(--cream); padding: 0.3rem 0.8rem; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 500;
+        }
+        .spot-route-arrow { color: var(--accent); font-weight: 600; }
+        .spot-tip-box {
+            background: #fef3c7; border-left: 3px solid var(--gold);
+            padding: 0.6rem 0.8rem; border-radius: 0 6px 6px 0;
+            font-size: 0.85rem; color: #78350f;
+        }
+
+        .spot-map-container {
+            width: 100%; height: 280px; border-radius: 12px;
+            overflow: hidden; border: 1px solid var(--border);
+            margin-bottom: 1.2rem; position: relative;
+        }
+        .spot-map-container #spotMiniMap {
+            width: 100%; height: 100%;
+        }
+
+        .footer {
+            margin-top: 4rem; padding: 3rem 2rem;
+            background: var(--ink); color: rgba(255,255,255,0.6); text-align: center;
+        }
+        .footer-text {
+            font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -20; }
+        }
+
+        @media (max-width: 1024px) { .map-layout { grid-template-columns: 1fr; } .hero-title { font-size: 3rem; } }
+        @media (max-width: 768px) {
+            .hero { padding: 3rem 1.5rem 2rem; } .hero-title { font-size: 2.2rem; }
+            .main { padding: 1.5rem; } .day-title { font-size: 2rem; }
+            .amap-container { height: 400px; }
+        }
+        .transport-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .transport-cards-grid .transport-section { margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-content">
+            <p class="hero-subtitle">2026年4月30日 - 5月3日 · 4天3晚 · 2人同行</p>
+            <div class="hero-weather">
+                <span class="weather-item">🌤️ 晴转多云</span>
+                <span class="weather-item">🌡️ 15°C - 28°C</span>
+                <span class="weather-item">💨 微风2-3级</span>
+            </div>
+            <div class="hero-stats">
+                <div class="stat"><span class="stat-value">9</span><span class="stat-label">景点</span></div>
+                <div class="stat"><span class="stat-value">2</span><span class="stat-label">演唱会</span></div>
+                <div class="stat"><span class="stat-value">4</span><span class="stat-label">天</span></div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <button class="nav-btn active" onclick="showDay(0)">4.30 周四</button>
+            <button class="nav-btn" onclick="showDay(1)">5.1 周五</button>
+            <button class="nav-btn" onclick="showDay(2)">5.2 周六</button>
+            <button class="nav-btn" onclick="showDay(3)">5.3 周日</button>
+        </div>
+    </nav>
+
+    <main class="main">
+        <section class="day-section active" id="day0">
+            <div class="day-header">
+                <span class="day-number">Day 01 · 4月30日 周四</span>
+                <span class="day-tips">⚠️ 故宫需提前7天20:00抢票！从中山公园进入故宫避开午门人流；天坛联票含祈年殿/圜丘/回音壁，必买联票</span>
+            </div>
+            <div class="map-frame" style="margin-bottom: 2rem;">
+                <div class="map-legend">
+                    <div class="legend-item"><div class="legend-line subway"></div><span>地铁</span></div>
+                    <div class="legend-item"><div class="legend-line taxi"></div><span>打车</span></div>
+                    <div class="legend-item"><div class="legend-line walk"></div><span>步行</span></div>
+                </div>
+                <div id="map-day1" class="amap-container"></div>
+            </div>
+            <div class="sidebar" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-label">行程安排</div>
+                        <div class="timeline">
+                            <div class="timeline-item"><div class="timeline-time">08:50</div><div class="timeline-content">抵达北京西站</div></div>
+                            <div class="timeline-item"><div class="timeline-time">09:30</div><div class="timeline-content">入住宜尚酒店</div></div>
+                            <div class="timeline-item"><div class="timeline-time">10:00</div><div class="timeline-content">地铁前往中山公园</div></div>
+                            <div class="timeline-item"><div class="timeline-time">10:40</div><div class="timeline-content">中山公园（社稷坛/中山堂）</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">11:30</div><div class="timeline-content">故宫（中山公园→端门→午门进）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">15:00</div><div class="timeline-content">故宫游览完毕，地铁前往天坛</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">15:30</div><div class="timeline-content">天坛公园（祈年殿/回音壁/圜丘）</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">18:00</div><div class="timeline-content">前门大街（晚餐+逛胡同）</div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">门票信息</div>
+                        <div class="price-grid">
+                            <div class="price-tag"><span class="price-name">中山公园</span><span class="price-value price-free">免费</span></div>
+                            <div class="price-tag"><span class="price-name">故宫</span><span class="price-value">60元/人（旺季）</span></div>
+                            <div class="price-tag"><span class="price-name">天坛联票</span><span class="price-value">34元/人</span></div>
+                            <div class="price-tag"><span class="price-name">前门大街</span><span class="price-value price-free">免费</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card">
+                        <div class="card-label">交通指南</div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">宜尚酒店 → 中山公园</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day0" data-route="d0-subway-1" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 9号线→4号线→1号线
+                                        <div class="route-detail">
+                                            <span>🔄 国家图书馆→西单换乘</span>
+                                            <span>📍 11站</span>
+                                            <span>⏱️ 35分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day0" data-route="d0-taxi-1" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约10km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约35分钟</span>
+                                            <span>💰 约40元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">中山公园 → 故宫午门</div>
+                            <ul class="transport-list">
+                                <li class="transport-item walk" data-day="day0" data-route="d0-walk-1" data-type="walk">
+                                    <span class="transport-icon">🚶</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-walk">步行</span> 经社稷坛→端门→午门
+                                        <div class="route-detail">
+                                            <span>📍 约800m</span>
+                                            <span>⏱️ 约15分钟</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">故宫 → 天坛公园</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day0" data-route="d0-subway-2" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 1号线→5号线
+                                        <div class="route-detail">
+                                            <span>🔄 东单站换乘</span>
+                                            <span>📍 5站</span>
+                                            <span>⏱️ 12分钟</span>
+                                            <span>💰 3元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day0" data-route="d0-taxi-2" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约5km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约20分钟</span>
+                                            <span>💰 约25元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">天坛 → 前门大街</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day0" data-route="d0-subway-3" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 5号线→7号线
+                                        <div class="route-detail">
+                                            <span>🔄 磁器口站换乘</span>
+                                            <span>📍 3站</span>
+                                            <span>⏱️ 10分钟</span>
+                                            <span>💰 3元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item walk" data-day="day0" data-route="d0-walk-2" data-type="walk">
+                                    <span class="transport-icon">🚶</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-walk">步行</span> 经天坛路
+                                        <div class="route-detail">
+                                            <span>📍 约1.5km</span>
+                                            <span>⏱️ 约18分钟</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card tip-card" style="margin-top: 1.5rem;">
+                        <div class="card-label">提示</div>
+                        <p class="tip-text">故宫从中山公园进可避开午门排队人流；故宫约4小时，建议穿舒适鞋；天坛核心景点17:30关门，建议15:30前入园；前门大栅栏可买伴手礼，晚餐推荐全聚德。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="day-section" id="day1">
+            <div class="day-header">
+                <span class="day-number">Day 02 · 5月1日 周五</span>
+                <span class="day-tips">⚠️ 御河游船已购票 ✅，10:00紫御湾码头出发；颐和园联票含佛香阁/德和园/苏州街；晚上鸟巢演唱会，请带好门票和身份证</span>
+            </div>
+            <div class="map-frame" style="margin-bottom: 2rem;">
+                <div class="map-legend">
+                    <div class="legend-item"><div class="legend-line subway"></div><span>地铁</span></div>
+                    <div class="legend-item"><div class="legend-line taxi"></div><span>打车</span></div>
+                    <div class="legend-item"><div class="legend-line walk"></div><span>步行</span></div>
+                </div>
+                <div id="map-day2" class="amap-container"></div>
+            </div>
+            <div class="sidebar" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <div class="card concert-card">
+                        <div class="card-label">今晚</div>
+                        <span class="concert-badge">已购票 ✅</span>
+                        <h3 class="concert-title">五月天「5525+2 回到那一天」</h3>
+                        <div class="concert-meta">
+                            <span>📍 国家体育场（鸟巢）</span>
+                            <span>⏰ 18:00开始</span>
+                            <span>预计21:00结束</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">行程安排</div>
+                        <div class="timeline">
+                            <div class="timeline-item"><div class="timeline-time">08:30</div><div class="timeline-content">酒店出发，地铁前往紫竹院</div></div>
+                            <div class="timeline-item"><div class="timeline-time">09:30</div><div class="timeline-content">到达紫御湾码头，换票候船</div></div>
+                            <div class="timeline-item"><div class="timeline-time">10:00</div><div class="timeline-content">🚢 皇家御河游船（紫御湾→南如意）</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">10:30</div><div class="timeline-content">颐和园（从南如意门进入游览）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">15:00</div><div class="timeline-content">可选：圆明园（近颐和园，步行可达）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">17:00</div><div class="timeline-content">出发前往鸟巢</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">18:00</div><div class="timeline-content">鸟巢演唱会</div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">门票信息</div>
+                        <div class="price-grid">
+                            <div class="price-tag"><span class="price-name">御河游船</span><span class="price-value price-booked">已购票 ✅</span></div>
+                            <div class="price-tag"><span class="price-name">颐和园</span><span class="price-value">30元/人（旺季）</span></div>
+                            <div class="price-tag"><span class="price-name">圆明园</span><span class="price-value">10元/人（门票），联票15元/人</span></div>
+                            <div class="price-tag"><span class="price-name">鸟巢</span><span class="price-value price-booked">已购票 ✅</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card">
+                        <div class="card-label">交通指南</div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">宜尚酒店 → 紫竹院紫御湾码头</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day1" data-route="d1-subway-1" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 9号线→4号线
+                                        <div class="route-detail">
+                                            <span>🔄 国家图书馆站换乘</span>
+                                            <span>📍 7站</span>
+                                            <span>⏱️ 25分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day1" data-route="d1-taxi-1" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约6km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约20分钟</span>
+                                            <span>💰 约22元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">紫御湾码头 → 颐和园南如意门</div>
+                            <ul class="transport-list">
+                                <li class="transport-item" data-day="day1" data-route="d1-cruise" data-type="cruise" style="cursor:default;">
+                                    <span class="transport-icon">🚢</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge" style="background:#0891b2;color:white;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;">御河游船</span> 皇家御河航线
+                                        <div class="route-detail">
+                                            <span>📍 约5km水路</span>
+                                            <span>⏱️ 约30分钟</span>
+                                            <span>💰 已购票 ✅</span>
+                                        </div>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">颐和园 → 圆明园（可选）</div>
+                            <ul class="transport-list">
+                                <li class="transport-item walk" data-day="day1" data-route="d1-walk-1" data-type="walk">
+                                    <span class="transport-icon">🚶</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-walk">步行</span> 经颐和园路
+                                        <div class="route-detail">
+                                            <span>📍 约1.2km</span>
+                                            <span>⏱️ 约15分钟</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day1" data-route="d1-taxi-2" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约2km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约5分钟</span>
+                                            <span>💰 约13元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">圆明园 → 鸟巢</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day1" data-route="d1-subway-2" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 4号线→8号线
+                                        <div class="route-detail">
+                                            <span>🔄 北土城站换乘</span>
+                                            <span>📍 5站</span>
+                                            <span>⏱️ 20分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day1" data-route="d1-taxi-3" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约6km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约15分钟</span>
+                                            <span>💰 约18元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card tip-card" style="margin-top: 1.5rem;">
+                        <div class="card-label">提示</div>
+                        <p class="tip-text">游船已购票，10:00发船，提前30分钟到码头；颐和园建议买联票（含佛香阁/德和园/苏州街）；圆明园门票10元，联票15元（含西洋楼遗址）；如果不去圆明园，颐和园玩到15:30直接出发去鸟巢即可；鸟巢18:00开始，提前2小时安检入场。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="day-section" id="day2">
+            <div class="day-header">
+                <span class="day-number">Day 03 · 5月2日 周六</span>
+                <span class="day-tips">⚠️ 军事博物馆需提前5天预约，B1兵器展必看；国博免费需提前1-7天预约（周一闭馆）；两馆各预留3小时，中间留足休息时间；晚上逛王府井吃晚餐</span>
+            </div>
+            <div class="map-frame" style="margin-bottom: 2rem;">
+                <div class="map-legend">
+                    <div class="legend-item"><div class="legend-line subway"></div><span>地铁</span></div>
+                    <div class="legend-item"><div class="legend-line taxi"></div><span>打车</span></div>
+                    <div class="legend-item"><div class="legend-line walk"></div><span>步行</span></div>
+                </div>
+                <div id="map-day3" class="amap-container"></div>
+            </div>
+            <div class="sidebar" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <div class="card">
+                        <div class="card-label">行程安排</div>
+                        <div class="timeline">
+                            <div class="timeline-item"><div class="timeline-time">09:00</div><div class="timeline-content">酒店出发，地铁前往军事博物馆</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">09:30</div><div class="timeline-content">军事博物馆（B1兵器馆+各展厅）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">12:30</div><div class="timeline-content">午餐+休息（两馆之间留足缓冲）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">14:00</div><div class="timeline-content">地铁前往国家博物馆</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">14:30</div><div class="timeline-content">国家博物馆（B1古代中国展+复兴之路）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">17:00</div><div class="timeline-content">国博闭馆，地铁前往王府井</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">17:30</div><div class="timeline-content">王府井（晚餐+逛街+伴手礼）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">20:00</div><div class="timeline-content">返回酒店休息</div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">门票信息</div>
+                        <div class="price-grid">
+                            <div class="price-tag"><span class="price-name">军事博物馆</span><span class="price-value price-free">免费（需预约）</span></div>
+                            <div class="price-tag"><span class="price-name">国家博物馆</span><span class="price-value price-free">免费（需预约）</span></div>
+                            <div class="price-tag"><span class="price-name">王府井</span><span class="price-value price-free">免费</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card">
+                        <div class="card-label">交通指南</div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">宜尚酒店 → 军事博物馆</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day2" data-route="d2-subway-1" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 9号线
+                                        <div class="route-detail">
+                                            <span>🔄 无需换乘</span>
+                                            <span>📍 1站</span>
+                                            <span>⏱️ 3分钟</span>
+                                            <span>💰 3元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day2" data-route="d2-taxi-1" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约1.5km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约5分钟</span>
+                                            <span>💰 约13元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">军事博物馆 → 国家博物馆</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day2" data-route="d2-subway-2" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 9号线→1号线
+                                        <div class="route-detail">
+                                            <span>🔄 军事博物馆站换乘</span>
+                                            <span>📍 5站</span>
+                                            <span>⏱️ 20分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day2" data-route="d2-taxi-2" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约8km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约20分钟</span>
+                                            <span>💰 约25元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">国家博物馆 → 王府井</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day2" data-route="d2-subway-3" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 1号线
+                                        <div class="route-detail">
+                                            <span>🔄 无需换乘</span>
+                                            <span>📍 1站</span>
+                                            <span>⏱️ 3分钟</span>
+                                            <span>💰 2元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item walk" data-day="day2" data-route="d2-walk-1" data-type="walk">
+                                    <span class="transport-icon">🚶</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-walk">步行</span> 经东长安街
+                                        <div class="route-detail">
+                                            <span>📍 约1.2km</span>
+                                            <span>⏱️ 约15分钟</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">王府井 → 宜尚酒店</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day2" data-route="d2-subway-4" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 1号线→9号线
+                                        <div class="route-detail">
+                                            <span>🔄 军事博物馆站换乘</span>
+                                            <span>📍 8站</span>
+                                            <span>⏱️ 25分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day2" data-route="d2-taxi-3" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约7km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约20分钟</span>
+                                            <span>💰 约22元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card tip-card" style="margin-top: 1.5rem;">
+                        <div class="card-label">提示</div>
+                        <p class="tip-text">军博B1兵器展最震撼（真飞机坦克导弹）；国博B1古代中国展是精华（后母戊鼎、四羊方尊必打卡）；两馆各留3小时，中间缓冲1.5小时别赶；王府井晚餐推荐四季民福烤鸭/东来顺，稻香村买伴手礼（京八件），步行街晚上灯光很美。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="day-section" id="day3">
+            <div class="day-header">
+                <span class="day-number">Day 04 · 5月3日 周日</span>
+                <span class="day-tips">⚠️ 今天返程，18:30需回到酒店拿行李再去北京西站；恭王府约2小时，雍和宫约1.5小时；清华北大需提前在"参观清华/北大"小程序预约</span>
+            </div>
+            <div class="map-frame" style="margin-bottom: 2rem;">
+                <div class="map-legend">
+                    <div class="legend-item"><div class="legend-line subway"></div><span>地铁</span></div>
+                    <div class="legend-item"><div class="legend-line taxi"></div><span>打车</span></div>
+                    <div class="legend-item"><div class="legend-line walk"></div><span>步行</span></div>
+                </div>
+                <div id="map-day4" class="amap-container"></div>
+            </div>
+            <div class="sidebar" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <div class="card">
+                        <div class="card-label">行程安排</div>
+                        <div class="timeline">
+                            <div class="timeline-item"><div class="timeline-time">08:30</div><div class="timeline-content">酒店出发，地铁前往恭王府</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">09:30</div><div class="timeline-content">恭王府（福字碑/大戏楼/后罩楼）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">12:00</div><div class="timeline-content">午餐（附近小吃）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">13:00</div><div class="timeline-content">出发前往雍和宫</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">13:30</div><div class="timeline-content">雍和宫（万福阁/五百罗汉山）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">15:00</div><div class="timeline-content">可选：清华/北大校园参观（需提前预约）</div></div>
+                            <div class="timeline-item clickable"><div class="timeline-time">16:00</div><div class="timeline-content">南锣鼓巷+烟袋斜街+什刹海</div></div>
+                            <div class="timeline-item"><div class="timeline-time">17:30</div><div class="timeline-content">返回宜尚酒店拿行李</div></div>
+                            <div class="timeline-item"><div class="timeline-time">18:30</div><div class="timeline-content">出发去北京西站（地铁9号线3分钟）</div></div>
+                            <div class="timeline-item"><div class="timeline-time">19:00</div><div class="timeline-content">抵达北京西站</div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">门票信息</div>
+                        <div class="price-grid">
+                            <div class="price-tag"><span class="price-name">恭王府</span><span class="price-value">40元/人</span></div>
+                            <div class="price-tag"><span class="price-name">雍和宫</span><span class="price-value">25元/人</span></div>
+                            <div class="price-tag"><span class="price-name">清华北大</span><span class="price-value price-free">免费（需预约）</span></div>
+                            <div class="price-tag"><span class="price-name">南锣鼓巷</span><span class="price-value price-free">免费</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card">
+                        <div class="card-label">交通指南</div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">宜尚酒店 → 恭王府</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day3" data-route="d3-subway-1" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 9号线→6号线
+                                        <div class="route-detail">
+                                            <span>🔄 白石桥南站换乘</span>
+                                            <span>📍 8站</span>
+                                            <span>⏱️ 28分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day3" data-route="d3-taxi-1" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约5km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约18分钟</span>
+                                            <span>💰 约18元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">恭王府 → 雍和宫</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day3" data-route="d3-subway-2" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 6号线→5号线
+                                        <div class="route-detail">
+                                            <span>🔄 东四站换乘</span>
+                                            <span>📍 6站</span>
+                                            <span>⏱️ 20分钟</span>
+                                            <span>💰 4元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day3" data-route="d3-taxi-2" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约4km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约12分钟</span>
+                                            <span>💰 约15元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">雍和宫 → 清华/北大（可选）</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day3" data-route="d3-subway-3" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 5号线→13号线/4号线
+                                        <div class="route-detail">
+                                            <span>🔄 西直门/海淀黄庄换乘</span>
+                                            <span>📍 6站</span>
+                                            <span>⏱️ 15分钟</span>
+                                            <span>💰 3元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day3" data-route="d3-taxi-3" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约6km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约10分钟</span>
+                                            <span>💰 约12元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">清华/北大 → 南锣鼓巷</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day3" data-route="d3-subway-4" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 4号线→6号线
+                                        <div class="route-detail">
+                                            <span>🔄 平安里站换乘</span>
+                                            <span>📍 6站</span>
+                                            <span>⏱️ 18分钟</span>
+                                            <span>💰 3元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day3" data-route="d3-taxi-4" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约7km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约15分钟</span>
+                                            <span>💰 约18元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">南锣鼓巷 → 宜尚酒店（拿行李）</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day3" data-route="d3-subway-5" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 6号线→9号线
+                                        <div class="route-detail">
+                                            <span>🔄 白石桥南站换乘</span>
+                                            <span>📍 7站</span>
+                                            <span>⏱️ 20分钟</span>
+                                            <span>💰 3元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day3" data-route="d3-taxi-5" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约7km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约20分钟</span>
+                                            <span>💰 约22元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="transport-section">
+                            <div class="transport-section-title">宜尚酒店 → 北京西站</div>
+                            <ul class="transport-list">
+                                <li class="transport-item subway recommended" data-day="day3" data-route="d3-subway-6" data-type="subway">
+                                    <span class="transport-icon">🚇</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-subway">地铁</span> 9号线
+                                        <div class="route-detail">
+                                            <span>🔄 无需换乘</span>
+                                            <span>📍 1站</span>
+                                            <span>⏱️ 3分钟</span>
+                                            <span>💰 2元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                                <li class="transport-item taxi" data-day="day3" data-route="d3-taxi-6" data-type="taxi">
+                                    <span class="transport-icon">🚗</span>
+                                    <span class="transport-text">
+                                        <span class="transport-type-badge badge-taxi">打车</span> 约1.5km
+                                        <div class="route-detail">
+                                            <span>⏱️ 约5分钟</span>
+                                            <span>💰 约13元</span>
+                                        </div>
+                                    </span>
+                                    <span class="route-label">点击显示</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card tip-card" style="margin-top: 1.5rem;">
+                        <div class="card-label">提示</div>
+                        <p class="tip-text">恭王府"福"字碑必摸；雍和宫可请香；清华北大需提前在对应小程序预约（限流）；南锣鼓巷适合拍照买文创；17:30回酒店拿行李，18:30出发去北京西站（地铁9号线仅1站约3分钟），19:00到达车站。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="spot-modal-overlay" id="spotModal" onclick="closeSpotModal(event)">
+        <div class="spot-modal" onclick="event.stopPropagation()">
+            <div class="spot-modal-header">
+                <div class="spot-modal-title" id="spotModalTitle"></div>
+                <button class="spot-modal-close" onclick="closeSpotModal()">&times;</button>
+            </div>
+            <div class="spot-modal-body" id="spotModalBody">
+                <div class="spot-map-container" id="spotMapContainer" style="display:none;">
+                    <div id="spotMiniMap"></div>
+                </div>
+                <div id="spotContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-text">愿你在北京，遇见千年古都的温柔</p>
+    </footer>
+
+    <script>
+        let maps = {};
+        let allRoutes = {};
+        let activeRouteType = {};
+
+        const locations = {
+            '北京西站': [116.321512, 39.901776],
+            '宜尚酒店': [116.322512, 39.902776],
+            '军事博物馆': [116.334512, 39.907167],
+            '天坛公园': [116.403212, 39.880167],
+            '前门大街': [116.398512, 39.898167],
+            '紫竹院码头': [116.331512, 39.948167],
+            '颐和园': [116.275212, 39.999167],
+            '鸟巢': [116.392212, 39.992167],
+            '故宫': [116.397212, 39.918167],
+            '中山公园': [116.391512, 39.913167],
+            '国家博物馆': [116.400512, 39.906167],
+            '圆明园': [116.305512, 39.999167],
+            '恭王府': [116.382212, 39.935167],
+            '雍和宫': [116.416212, 39.950167],
+            '清华北大': [116.310512, 39.990167],
+            '南锣鼓巷': [116.401212, 39.936167],
+            '王府井': [116.411012, 39.913167]
+        };
+
+        const dayRoutes = {
+            'day0': {
+                'd0-subway-1': { from: '宜尚酒店', to: '中山公园', type: 'subway' },
+                'd0-taxi-1': { from: '宜尚酒店', to: '中山公园', type: 'taxi' },
+                'd0-walk-1': { from: '中山公园', to: '故宫', type: 'walk' },
+                'd0-subway-2': { from: '故宫', to: '天坛公园', type: 'subway' },
+                'd0-taxi-2': { from: '故宫', to: '天坛公园', type: 'taxi' },
+                'd0-subway-3': { from: '天坛公园', to: '前门大街', type: 'subway' },
+                'd0-walk-2': { from: '天坛公园', to: '前门大街', type: 'walk' }
+            },
+            'day1': {
+                'd1-subway-1': { from: '宜尚酒店', to: '紫竹院码头', type: 'subway' },
+                'd1-taxi-1': { from: '宜尚酒店', to: '紫竹院码头', type: 'taxi' },
+                'd1-cruise': { from: '紫竹院码头', to: '颐和园', type: 'cruise' },
+                'd1-walk-1': { from: '颐和园', to: '圆明园', type: 'walk' },
+                'd1-taxi-2': { from: '颐和园', to: '圆明园', type: 'taxi' },
+                'd1-subway-2': { from: '圆明园', to: '鸟巢', type: 'subway' },
+                'd1-taxi-3': { from: '圆明园', to: '鸟巢', type: 'taxi' }
+            },
+            'day2': {
+                'd2-subway-1': { from: '宜尚酒店', to: '军事博物馆', type: 'subway' },
+                'd2-taxi-1': { from: '宜尚酒店', to: '军事博物馆', type: 'taxi' },
+                'd2-subway-2': { from: '军事博物馆', to: '国家博物馆', type: 'subway' },
+                'd2-taxi-2': { from: '军事博物馆', to: '国家博物馆', type: 'taxi' },
+                'd2-subway-3': { from: '国家博物馆', to: '王府井', type: 'subway' },
+                'd2-walk-1': { from: '国家博物馆', to: '王府井', type: 'walk' },
+                'd2-subway-4': { from: '王府井', to: '宜尚酒店', type: 'subway' },
+                'd2-taxi-3': { from: '王府井', to: '宜尚酒店', type: 'taxi' }
+            },
+            'day3': {
+                'd3-subway-1': { from: '宜尚酒店', to: '恭王府', type: 'subway' },
+                'd3-taxi-1': { from: '宜尚酒店', to: '恭王府', type: 'taxi' },
+                'd3-subway-2': { from: '恭王府', to: '雍和宫', type: 'subway' },
+                'd3-taxi-2': { from: '恭王府', to: '雍和宫', type: 'taxi' },
+                'd3-subway-3': { from: '雍和宫', to: '清华北大', type: 'subway' },
+                'd3-taxi-3': { from: '雍和宫', to: '清华北大', type: 'taxi' },
+                'd3-subway-4': { from: '清华北大', to: '南锣鼓巷', type: 'subway' },
+                'd3-taxi-4': { from: '清华北大', to: '南锣鼓巷', type: 'taxi' },
+                'd3-subway-5': { from: '南锣鼓巷', to: '宜尚酒店', type: 'subway' },
+                'd3-taxi-5': { from: '南锣鼓巷', to: '宜尚酒店', type: 'taxi' },
+                'd3-subway-6': { from: '宜尚酒店', to: '北京西站', type: 'subway' },
+                'd3-taxi-6': { from: '宜尚酒店', to: '北京西站', type: 'taxi' }
+            }
+        };
+
+        const routeColors = { subway: '#3b82f6', taxi: '#f59e0b', walk: '#10b981', cruise: '#0891b2' };
+        const routeDashArrays = { subway: [], taxi: [10, 5], walk: [8, 6], cruise: [12, 4] };
+
+        const subwayInfo = {
+            'd0-subway-1': { time: '35分钟', price: '4元' },
+            'd0-subway-2': { time: '12分钟', price: '3元' },
+            'd0-subway-3': { time: '10分钟', price: '3元' },
+            'd1-subway-1': { time: '25分钟', price: '4元' },
+            'd1-subway-2': { time: '25分钟', price: '4元' },
+            'd2-subway-1': { time: '3分钟', price: '3元' },
+            'd2-subway-2': { time: '20分钟', price: '4元' },
+            'd2-subway-3': { time: '3分钟', price: '2元' },
+            'd2-subway-4': { time: '25分钟', price: '4元' },
+            'd3-subway-1': { time: '28分钟', price: '4元' },
+            'd3-subway-2': { time: '20分钟', price: '4元' },
+            'd3-subway-3': { time: '15分钟', price: '3元' },
+            'd3-subway-4': { time: '18分钟', price: '3元' },
+            'd3-subway-5': { time: '20分钟', price: '3元' },
+            'd3-subway-6': { time: '3分钟', price: '2元' }
+        };
+
+        const taxiInfo = {
+            'd0-taxi-1': { time: '35分钟', price: '40元' },
+            'd0-taxi-2': { time: '20分钟', price: '25元' },
+            'd1-taxi-1': { time: '20分钟', price: '22元' },
+            'd1-taxi-2': { time: '5分钟', price: '13元' },
+            'd1-taxi-3': { time: '15分钟', price: '18元' },
+            'd2-taxi-1': { time: '5分钟', price: '13元' },
+            'd2-taxi-2': { time: '20分钟', price: '25元' },
+            'd2-taxi-3': { time: '20分钟', price: '22元' },
+            'd3-taxi-1': { time: '18分钟', price: '18元' },
+            'd3-taxi-2': { time: '12分钟', price: '15元' },
+            'd3-taxi-3': { time: '10分钟', price: '12元' },
+            'd3-taxi-4': { time: '15分钟', price: '18元' },
+            'd3-taxi-5': { time: '20分钟', price: '22元' },
+            'd3-taxi-6': { time: '5分钟', price: '13元' }
+        };
+
+        const walkInfo = {
+            'd0-walk-1': { time: '15分钟' },
+            'd0-walk-2': { time: '18分钟' },
+            'd1-walk-1': { time: '15分钟' },
+            'd2-walk-1': { time: '15分钟' }
+        };
+
+        const cruiseInfo = {
+            'd1-cruise': { time: '约30分钟', price: '已购票 ✅', route: '紫御湾码头→南如意门', label: '御河游船 30分钟 已购票 ✅' }
+        };
+
+        const spotRouteCoords = {
+            '故宫': {
+                center: [116.3972, 39.9182],
+                zoom: 16,
+                bounds: [[116.3920, 39.9100], [116.4020, 39.9260]],
+                route: [
+                    // 午门入口 → 武英殿 → 太和殿 → 中和殿 → 保和殿 → 乾清宫 → 交泰殿 → 坤宁宫 → 御花园 → 神武门
+                    [116.396800, 39.911800], [116.397000, 39.911770], [116.397200, 39.911750],
+                    [116.397400, 39.911740], [116.397600, 39.911730], [116.397800, 39.911720], [116.397900, 39.911720],
+                    [116.398000, 39.911720], [116.398200, 39.911710], [116.398400, 39.911700], [116.398600, 39.911700],
+                    [116.398800, 39.911690], [116.398900, 39.911690],
+                    // 太和门
+                    [116.398900, 39.912100], [116.398850, 39.912500], [116.398800, 39.912900], [116.398750, 39.913300],
+                    // 太和殿
+                    [116.398700, 39.913700], [116.398650, 39.914100], [116.398600, 39.914500],
+                    // 中和殿
+                    [116.398550, 39.914900], [116.398500, 39.915300],
+                    // 保和殿
+                    [116.398450, 39.915700], [116.398400, 39.916100],
+                    // 乾清门
+                    [116.398350, 39.916500], [116.398300, 39.916900],
+                    // 乾清宫
+                    [116.398250, 39.917300], [116.398200, 39.917700],
+                    // 交泰殿
+                    [116.398150, 39.918100], [116.398100, 39.918500],
+                    // 坤宁宫
+                    [116.398050, 39.918900], [116.398000, 39.919300],
+                    // 御花园
+                    [116.397950, 39.919700], [116.397900, 39.920100], [116.397850, 39.920500],
+                    // 神武门出口
+                    [116.397800, 39.920900], [116.397750, 39.921300], [116.397700, 39.921700],
+                    [116.397650, 39.922100], [116.397600, 39.922500], [116.397550, 39.922900],
+                    [116.397500, 39.923100]
+                ]
+            },
+            '天安门广场': {
+                center: [116.3975, 39.9050],
+                zoom: 16,
+                bounds: [[116.3900, 39.8980], [116.4050, 39.9120]],
+                route: [
+                    // 天安门城楼 → 金水桥 → 人民英雄纪念碑 → 毛主席纪念堂 → 国家博物馆 → 正阳门
+                    [116.397500, 39.904100], [116.397400, 39.904200], [116.397300, 39.904300],
+                    [116.397200, 39.904500], [116.397150, 39.904800], [116.397100, 39.905100],
+                    // 金水桥
+                    [116.397100, 39.905400], [116.397050, 39.905700], [116.397000, 39.906000],
+                    // 人民英雄纪念碑
+                    [116.397000, 39.906300], [116.396950, 39.906600], [116.396900, 39.906900],
+                    // 毛主席纪念堂
+                    [116.396900, 39.907200], [116.396850, 39.907500], [116.396800, 39.907800],
+                    // 国家博物馆方向
+                    [116.397100, 39.907800], [116.397400, 39.907750], [116.397700, 39.907700],
+                    [116.398000, 39.907650], [116.398300, 39.907600], [116.398600, 39.907550],
+                    // 正阳门
+                    [116.398600, 39.907200], [116.398650, 39.906800], [116.398700, 39.906400],
+                    [116.398750, 39.906000], [116.398800, 39.905600], [116.398850, 39.905200],
+                    [116.398900, 39.904800], [116.398900, 39.904400], [116.398900, 39.904000]
+                ]
+            },
+            '圆明园': {
+                tips: '⚠️ 圆明园无需预约，现场购票即可。但建议买联票15元（含西洋楼遗址），单买门票10元进不去核心景区。4-10月为旺季，建议提前线上购票避免排队。',
+                ticket: '门票10元/人，联票15元/人（含西洋楼遗址10元+畅春园5元）。联票强烈推荐！60岁以上老人半价，6周岁以下儿童免费。',
+                entrance: '推荐从东门（清华西路）进入，离颐和园步行15分钟。也可从南门进入。地址：海淀区清华西路28号。',
+                exit: '可从西门、南门或藻园门离开。建议不走回头路。',
+                hours: '旺季（4.1-10.31）：7:00-19:00，核心景点西洋楼遗址8:00-18:00。淡季（11.1-3.31）：7:00-17:00，核心景点8:30-16:30。建议至少留1.5-2小时。',
+                routeTitle: '圆明园经典游览路线（约1.5-2小时）',
+                route: [
+                    {name: '东门（入口）', desc: '清华西路，近颐和园'},
+                    {name: '绮春园', desc: '三园之一，湖面景观'},
+                    {name: '福海', desc: '圆明园最大湖泊，核心景观'},
+                    {name: '西洋楼遗址', desc: '大水法遗址，圆明园标志，必打卡'},
+                    {name: '长春园', desc: '三园之一，欧式园林'},
+                    {name: '黄花阵', desc: '仿欧洲迷宫，可拍照体验'},
+                    {name: '西门（出口）', desc: '近圆明园地铁站'}
+                ],
+                highlights: '西洋楼遗址（大水法遗址，圆明园标志）、福海（最大湖泊）、黄花阵（欧式迷宫）。联票必买！',
+                tips_extra: '1. 必买联票（15元），单买门票进不去西洋楼遗址。2. 西洋楼遗址是核心，留40分钟以上。3. 园内有电瓶车（另收费），可节省体力。4. 穿舒适运动鞋（园区很大）。5. 建议从颐和园步行15分钟到达。6. 园内简餐少，建议自带水。7. 圆明园地铁4号线可达。8. 如果时间紧（赶演唱会），1.5小时速览即可。'
+            },
+            '恭王府': {
+                center: [116.3812, 39.9365],
+                zoom: 17,
+                bounds: [[116.3780, 39.9330], [116.3840, 39.9400]],
+                route: [
+                    // 东门 → 银安殿 → 嘉乐堂 → 后罩楼 → 蝠池 → 西洋门 → 蝠厅 → 福字碑 → 大戏楼 → 出口
+                    [116.383200, 39.936100], [116.382800, 39.936100], [116.382400, 39.936100],
+                    [116.382000, 39.936100], [116.381600, 39.936100],
+                    // 银安殿
+                    [116.381200, 39.936100], [116.380800, 39.936150], [116.380400, 39.936200],
+                    // 嘉乐堂
+                    [116.380000, 39.936250], [116.379600, 39.936300], [116.379200, 39.936350],
+                    // 后罩楼
+                    [116.379200, 39.936700], [116.379200, 39.937100], [116.379250, 39.937500],
+                    // 蝠池
+                    [116.379300, 39.937500], [116.379700, 39.937450], [116.380100, 39.937400],
+                    // 西洋门
+                    [116.380100, 39.937000], [116.380100, 39.936600],
+                    // 蝠厅
+                    [116.380500, 39.936600], [116.380900, 39.936600],
+                    // 福字碑
+                    [116.380900, 39.936200], [116.381300, 39.936200], [116.381700, 39.936200],
+                    // 大戏楼
+                    [116.382100, 39.936200], [116.382500, 39.936150], [116.382900, 39.936100],
+                    // 出口
+                    [116.383200, 39.936050]
+                ]
+            },
+            '中山公园': {
+                center: [116.3915, 39.9135],
+                zoom: 17,
+                bounds: [[116.3890, 39.9100], [116.3950, 39.9170]],
+                route: [
+                    // 中山公园南门 → 社稷坛 → 中山堂 → 故宫端门 → 故宫午门
+                    [116.391500, 39.910500], [116.391500, 39.910800], [116.391500, 39.911100],
+                    [116.391600, 39.911400], [116.391700, 39.911700], [116.391800, 39.912000],
+                    // 社稷坛
+                    [116.391800, 39.912300], [116.391900, 39.912600],
+                    // 中山堂
+                    [116.392000, 39.912900], [116.392100, 39.913200],
+                    // 出公园东门到故宫端门
+                    [116.392500, 39.913200], [116.393000, 39.913200], [116.393500, 39.913200],
+                    [116.394000, 39.913200], [116.394500, 39.913200], [116.395000, 39.913200],
+                    // 端门
+                    [116.395500, 39.912800], [116.396000, 39.912400], [116.396500, 39.912000],
+                    // 午门(故宫入口)
+                    [116.396800, 39.911800], [116.397000, 39.911770]
+                ]
+            },
+            '天坛公园': {
+                center: [116.4035, 39.8825],
+                zoom: 16,
+                bounds: [[116.3970, 39.8750], [116.4100, 39.8900]],
+                route: [
+                    // 东门 → 七星石 → 祈年门 → 祈年殿 → 皇穹宇 → 回音壁 → 圜丘 → 斋宫 → 南门
+                    [116.4100, 39.8825], [116.4075, 39.8828], [116.4055, 39.8828],
+                    // 祈年殿
+                    [116.4035, 39.8828], [116.4035, 39.8820],
+                    // 皇穹宇/回音壁
+                    [116.4035, 39.8810], [116.4035, 39.8800],
+                    // 圜丘
+                    [116.4035, 39.8790], [116.4035, 39.8780],
+                    // 斋宫方向
+                    [116.4000, 39.8780],
+                    // 南门
+                    [116.4035, 39.8760]
+                ]
+            },
+            '国家博物馆': {
+                center: [116.4010, 39.9060],
+                zoom: 17,
+                bounds: [[116.3970, 39.9020], [116.4050, 39.9100]],
+                route: [
+                    // 南门 → 大厅 → B1古代中国展 → 一层复兴之路 → 二层专题展 → 四层 → 出口
+                    [116.401000, 39.904500], [116.401000, 39.905000], [116.401000, 39.905500],
+                    // 大厅
+                    [116.401000, 39.906000], [116.401100, 39.906200],
+                    // B1古代中国展（核心）
+                    [116.400800, 39.906200], [116.400500, 39.906200],
+                    [116.400200, 39.906200], [116.399900, 39.906200],
+                    [116.399600, 39.906200], [116.399300, 39.906200],
+                    // 后母戊鼎/四羊方尊展区
+                    [116.399300, 39.906400], [116.399300, 39.906600],
+                    // 一层复兴之路
+                    [116.399500, 39.906600], [116.399800, 39.906600],
+                    [116.400100, 39.906600], [116.400400, 39.906600],
+                    // 二层
+                    [116.400600, 39.906600], [116.400800, 39.906600],
+                    // 四层
+                    [116.401000, 39.906800], [116.401200, 39.907000],
+                    // 出口
+                    [116.401000, 39.907500], [116.401000, 39.908000]
+                ]
+            },
+            '军事博物馆': {
+                center: [116.3338, 39.9080],
+                zoom: 17,
+                bounds: [[116.3300, 39.9040], [116.3380, 39.9120]],
+                route: [
+                    // 正门 → 一层兵器馆 → 二层 → 三层 → 四层 → 中央大厅 → 出口
+                    [116.333800, 39.907500], [116.333800, 39.907700], [116.333750, 39.907900],
+                    // 一层兵器馆
+                    [116.333700, 39.908100], [116.333650, 39.908300], [116.333600, 39.908500],
+                    // 二层
+                    [116.333550, 39.908700], [116.333500, 39.908900], [116.333450, 39.909100],
+                    // 三层
+                    [116.333400, 39.909300], [116.333350, 39.909500], [116.333300, 39.909700],
+                    // 四层
+                    [116.333250, 39.909900], [116.333200, 39.910100],
+                    // 中央大厅
+                    [116.333400, 39.910100], [116.333600, 39.910050], [116.333800, 39.910000],
+                    // 出口
+                    [116.333800, 39.909600], [116.333800, 39.909200], [116.333800, 39.908800],
+                    [116.333800, 39.908400], [116.333800, 39.908000], [116.333800, 39.907600],
+                    [116.333800, 39.907200]
+                ]
+            },
+            '雍和宫': {
+                center: [116.4155, 39.9505],
+                zoom: 17,
+                bounds: [[116.4110, 39.9470], [116.4200, 39.9550]],
+                route: [
+                    // 南门 → 牌坊 → 昭泰门 → 天王殿 → 雍和宫大殿 → 永佑殿 → 法轮殿 → 万福阁 → 绥成殿 → 北门
+                    [116.415500, 39.949500], [116.415500, 39.949700], [116.415450, 39.949900],
+                    // 牌坊
+                    [116.415400, 39.950100], [116.415350, 39.950300],
+                    // 昭泰门
+                    [116.415300, 39.950500], [116.415250, 39.950700],
+                    // 天王殿
+                    [116.415200, 39.950900], [116.415150, 39.951100],
+                    // 雍和宫大殿
+                    [116.415100, 39.951300], [116.415050, 39.951500],
+                    // 永佑殿
+                    [116.415000, 39.951700], [116.414950, 39.951900],
+                    // 法轮殿
+                    [116.414900, 39.952100], [116.414850, 39.952300],
+                    // 万福阁
+                    [116.414800, 39.952500], [116.414750, 39.952700],
+                    // 绥成殿
+                    [116.414700, 39.952900], [116.414650, 39.953100],
+                    // 北门出口
+                    [116.414600, 39.953300], [116.414600, 39.953500], [116.414600, 39.953700],
+                    [116.414600, 39.953900]
+                ]
+            },
+            '王府井': {
+                center: [116.4110, 39.9130],
+                zoom: 17,
+                bounds: [[116.4070, 39.9080], [116.4150, 39.9180]],
+                route: [
+                    // 北口 → 新东安商场 → 王府井百货大楼 → 小吃街 → 东方新天地 → 稻香村 → 四季民福
+                    [116.410500, 39.915000], [116.410500, 39.914600], [116.410500, 39.914200],
+                    [116.410500, 39.913800], [116.410500, 39.913400],
+                    // 新东安商场
+                    [116.410600, 39.913400], [116.410700, 39.913400],
+                    // 王府井百货大楼
+                    [116.410700, 39.913000], [116.410700, 39.912600],
+                    // 小吃街
+                    [116.410800, 39.912600], [116.410900, 39.912600],
+                    // 东方新天地
+                    [116.410900, 39.912200], [116.410900, 39.911800],
+                    // 稻香村
+                    [116.410900, 39.911400], [116.410900, 39.911000],
+                    // 四季民福
+                    [116.410900, 39.910600], [116.410900, 39.910200], [116.410900, 39.909800],
+                    [116.410900, 39.909400], [116.410900, 39.909000]
+                ]
+            },
+            '南锣鼓巷': {
+                center: [116.4000, 39.9365],
+                zoom: 17,
+                bounds: [[116.3970, 39.9320], [116.4040, 39.9410]],
+                route: [
+                    // 南口 → 主街南段 → 文宇奶酪 → 创可贴8 → 主街北段 → 帽儿胡同 → 雨儿胡同 → 烟袋斜街
+                    [116.400000, 39.934500], [116.400000, 39.934700], [116.400000, 39.934900],
+                    [116.400000, 39.935100], [116.400000, 39.935300], [116.400000, 39.935500],
+                    // 文宇奶酪
+                    [116.399950, 39.935700], [116.399900, 39.935900],
+                    // 创可贴8
+                    [116.399850, 39.936100], [116.399800, 39.936300], [116.399750, 39.936500],
+                    // 主街北段
+                    [116.399700, 39.936700], [116.399650, 39.936900], [116.399600, 39.937100],
+                    // 帽儿胡同
+                    [116.399200, 39.937100], [116.398800, 39.937150], [116.398400, 39.937200],
+                    // 雨儿胡同
+                    [116.398400, 39.937500], [116.398450, 39.937800], [116.398500, 39.938100],
+                    // 烟袋斜街
+                    [116.398600, 39.938300], [116.398700, 39.938500], [116.398800, 39.938700],
+                    [116.398900, 39.938900], [116.399000, 39.939100]
+                ]
+            },
+            '颐和园': {
+                center: [116.2755, 39.9980],
+                zoom: 15,
+                bounds: [[116.2680, 39.9900], [116.2850, 40.0080]],
+                route: [
+                    // 南如意门 → 昆明湖 → 十七孔桥 → 长廊 → 佛香阁 → 排云殿 → 石舫 → 苏州街 → 谐趣园 → 东宫门
+                    [116.272500, 39.994500], [116.272500, 39.995000], [116.272500, 39.995500],
+                    // 昆明湖沿岸
+                    [116.272500, 39.996000], [116.272800, 39.996500], [116.273100, 39.997000],
+                    // 十七孔桥
+                    [116.273400, 39.997200], [116.273800, 39.997400], [116.274200, 39.997600],
+                    // 长廊
+                    [116.274600, 39.997800], [116.275000, 39.998000], [116.275400, 39.998200],
+                    [116.275800, 39.998400], [116.276200, 39.998600],
+                    // 佛香阁
+                    [116.276200, 39.999000], [116.276200, 39.999400], [116.276200, 39.999800],
+                    // 排云殿
+                    [116.276200, 40.000200], [116.276200, 40.000600],
+                    // 石舫
+                    [116.275800, 40.000600], [116.275400, 40.000600], [116.275000, 40.000600],
+                    // 苏州街
+                    [116.274800, 40.000800], [116.274600, 40.001000],
+                    // 谐趣园
+                    [116.275000, 40.001200], [116.275400, 40.001400], [116.275800, 40.001600],
+                    // 东宫门出口
+                    [116.276200, 40.001600], [116.276600, 40.001600], [116.277000, 40.001600]
+                ]
+            },
+            '紫竹院码头': {
+                center: [116.3315, 39.9482],
+                zoom: 17,
+                bounds: [[116.3280, 39.9450], [116.3350, 39.9510]],
+                route: [
+                    // 到达码头 → 检票 → 登船 → 航行 → 到达
+                    [116.331000, 39.947500], [116.331200, 39.947700], [116.331400, 39.947900],
+                    // 登船
+                    [116.331500, 39.948000], [116.331600, 39.948100],
+                    // 沿河道航行
+                    [116.331800, 39.948200], [116.332000, 39.948300], [116.332200, 39.948400],
+                    [116.332400, 39.948500], [116.332600, 39.948600], [116.332800, 39.948700],
+                    [116.333000, 39.948800], [116.333200, 39.948900]
+                ]
+            },
+            '清华北大': {
+                center: [116.3105, 39.9905],
+                zoom: 16,
+                bounds: [[116.3000, 39.9840], [116.3250, 40.0000]],
+                route: [
+                    // 清华西门 → 近春园 → 二校门 → 大礼堂 → 水木清华 → 北大东门 → 未名湖 → 博雅塔 → 北大西门
+                    [116.307500, 39.993500], [116.307800, 39.993300], [116.308100, 39.993100],
+                    // 近春园/荷塘
+                    [116.308400, 39.992900], [116.308700, 39.992700],
+                    // 二校门
+                    [116.309000, 39.992500], [116.309300, 39.992300],
+                    // 大礼堂
+                    [116.309600, 39.992100], [116.309900, 39.991900],
+                    // 水木清华
+                    [116.310200, 39.991700], [116.310500, 39.991500],
+                    // 往北大方向
+                    [116.310500, 39.990000], [116.310500, 39.989000], [116.310500, 39.988000],
+                    // 北大东门
+                    [116.311500, 39.988000], [116.312500, 39.988000],
+                    // 未名湖
+                    [116.312500, 39.988500], [116.312500, 39.989000], [116.312500, 39.989500],
+                    [116.312500, 39.990000], [116.312500, 39.990500],
+                    // 博雅塔
+                    [116.312500, 39.990800], [116.312500, 39.991100],
+                    // 北大西门
+                    [116.312000, 39.991100], [116.311500, 39.991100], [116.311000, 39.991100]
+                ]
+            },
+            '前门大街': {
+                center: [116.3980, 39.9000],
+                zoom: 16,
+                bounds: [[116.3930, 39.8940], [116.4040, 39.9070]],
+                route: [
+                    // 正阳门箭楼 → 前门步行街 → 全聚德 → 大栅栏 → 瑞蚨祥 → 张一元 → 鲜鱼口 → 北京坊
+                    [116.398000, 39.906500], [116.397950, 39.906100], [116.397900, 39.905700],
+                    [116.397850, 39.905300], [116.397800, 39.904900],
+                    // 全聚德
+                    [116.397750, 39.904500], [116.397700, 39.904100],
+                    // 大栅栏
+                    [116.397500, 39.904100], [116.397300, 39.904150], [116.397100, 39.904200],
+                    // 瑞蚨祥
+                    [116.397100, 39.903800], [116.397100, 39.903400],
+                    // 张一元
+                    [116.397100, 39.903000], [116.397100, 39.902600],
+                    // 鲜鱼口
+                    [116.397300, 39.902600], [116.397500, 39.902600], [116.397700, 39.902600],
+                    // 北京坊
+                    [116.397700, 39.902200], [116.397700, 39.901800], [116.397700, 39.901400],
+                    [116.397700, 39.901000], [116.397700, 39.900600], [116.397700, 39.900200],
+                    [116.397700, 39.899800], [116.397700, 39.899400], [116.397700, 39.899000]
+                ]
+            },
+        };
+
+        const spotDetails = {
+            '故宫': {
+                tips: '⚠️ 必须提前7天在"故宫博物院"微信小程序预约！每日20:00放票，旺季（4-10月）秒空，务必定闹钟。携带身份证原件，刷身份证入园。周一闭馆（法定节假日除外）。',
+                ticket: '旺季（4.1-10.31）60元/人；淡季（11.1-3.31）40元/人。珍宝馆10元、钟表馆10元（非常值得看）。6周岁以下/1.2米以下儿童免票（需成人陪同），6-18周岁未成年人免费（需预约免费票），学生20元。',
+                entrance: '唯一入口：午门（南门），地址：东城区景山前街4号。所有观众一律从午门进入，不可走其他门。推荐从中山公园（社稷坛）穿过端门到达午门，避开午门正门排队人流。',
+                exit: '出口：神武门（北门）或东华门（东门）。参观结束后从这两个门离开，不可从午门返回。',
+                hours: '旺季（4.1-10.31）：8:30开馆，16:00停止入馆，17:00闭馆。淡季（11.1-3.31）：8:30开馆，15:30停止入馆，16:30闭馆。建议上午场（最迟12:00检票）或下午场（最早11:00检票）。',
+                routeTitle: '经典中轴线+东西六宫游览路线（约3-4小时）',
+                route: [
+                    {name: '午门（入口）', desc: '刷身份证检票入园'},
+                    {name: '武英殿', desc: '瓷器展，建议先左转参观'},
+                    {name: '太和门', desc: '金水桥后第一道门'},
+                    {name: '太和殿（金銮殿）', desc: '三大殿之首，皇帝大典之处'},
+                    {name: '中和殿', desc: '皇帝休息更衣之处'},
+                    {name: '保和殿', desc: '殿后大石雕为故宫最大'},
+                    {name: '乾清门', desc: '内廷与外朝分界'},
+                    {name: '乾清宫', desc: '皇帝寝宫，"正大光明"匾'},
+                    {name: '交泰殿', desc: '皇后生日受贺之处'},
+                    {name: '坤宁宫', desc: '帝后大婚洞房'},
+                    {name: '御花园', desc: '假山亭台，四季皆美'},
+                    {name: '神武门/东华门（出口）', desc: '离开故宫'}
+                ],
+                highlights: '太和殿（金銮殿）、乾清宫"正大光明"匾、御花园、珍宝馆（金编钟等国宝）、钟表馆（西洋钟表）。文华殿陶瓷馆（常设展）。',
+                tips_extra: '1. 建议从南到北单向游览，不走回头路。2. 穿舒适运动鞋（要走1-2万步）。3. 宫内无便利店，自带水和零食。4. 珍宝馆和钟表馆非常值得额外花钱看。5. 建议租讲解器（20元）或请导游。6. 提前在小程序填好所有参观人信息，放票时直接选。7. 放票后30分钟内还有人退票，可以捡漏。'
+            },
+            '天安门广场': {
+                tips: '✅ 2026年最新：天安门广场参观无需预约！只需携带身份证原件，通过安检即可进入。但升旗时段（凌晨）仍需提前预约。旅游团需提前12小时预约。',
+                ticket: '广场免费。天安门城楼15元（需另预约）。毛主席纪念堂免费（需预约，仅上午开放）。国家博物馆免费（需提前7天预约）。',
+                entrance: '可从天安门城楼东侧或西侧通道进入广场。推荐从天安门城楼方向进入，正对人民英雄纪念碑。',
+                exit: '可从广场各方向离开。国家博物馆方向（东侧）、正阳门方向（南侧）、人民大会堂方向（西侧）均可。',
+                hours: '广场全天开放。升旗时间：4月约5:00-5:30。城楼：8:30-17:00（16:30停止入场）。毛主席纪念堂：周二至周日8:00-12:00（周一闭馆）。国家博物馆：9:00-17:00（16:00停止入馆，周一闭馆）。',
+                routeTitle: '天安门广场及周边游览路线（约1.5-2小时）',
+                route: [
+                    {name: '天安门城楼', desc: '可登城楼（15元），俯瞰广场全景'},
+                    {name: '金水桥', desc: '汉白玉桥，拍照打卡'},
+                    {name: '人民英雄纪念碑', desc: '广场中心，瞻仰缅怀'},
+                    {name: '毛主席纪念堂', desc: '需另预约，仅上午开放'},
+                    {name: '国家博物馆', desc: '需提前7天预约，古代中国展必看'},
+                    {name: '正阳门城楼', desc: '广场南端，老北京地标'}
+                ],
+                highlights: '天安门城楼（可登楼俯瞰）、人民英雄纪念碑、毛主席纪念堂、国家博物馆（免费但需预约）、正阳门城楼。',
+                tips_extra: '1. 广场面积大，穿舒适鞋子。2. 安检严格，大包需寄存，不要带危险品。3. 看升旗需凌晨3-4点到达占位。4. 附近有卫生间但人多排队。5. 国家博物馆的"古代中国"展是镇馆之宝，必看。6. 广场周边有地铁站（天安门东/天安门西/前门）。'
+            },
+            '国家博物馆': {
+                tips: '⚠️ 必须提前在"国家博物馆"官网或微信公众号预约！免费参观。2026年最新：提前1-7天预约，每日17:00放票，节假日建议提前7天约。周一闭馆（法定节假日除外）。携带身份证原件。',
+                ticket: '免费（需预约）。基本陈列免费，部分特展需另购票（一般30-50元）。',
+                entrance: '南门（天安门广场东侧）进入。地址：东城区长安街16号。地铁1号线天安门东站。',
+                exit: '北门（靠近长安街北侧）或原路从南门返回。',
+                hours: '周二至周日9:00-17:00（16:00停止入馆）。周一闭馆。国家法定节假日开放时间另行通知。',
+                routeTitle: '国家博物馆精华游览路线（约3-4小时）',
+                route: [
+                    {name: '南门（入口）', desc: '刷身份证/预约码入馆，安检'},
+                    {name: '中央大厅', desc: '宏伟的中庭空间，可拍照'},
+                    {name: 'B1层：古代中国展', desc: '国博镇馆之宝！从远古到明清，后母戊鼎、四羊方尊、金缕玉衣等必看'},
+                    {name: '一层：复兴之路展', desc: '近代中国历史，从鸦片战争到新中国'},
+                    {name: '二层：专题展览', desc: '各朝代文化艺术专题展'},
+                    {name: '四层：书画/佛像展', desc: '中国历代书画和佛像艺术'},
+                    {name: '出口', desc: '可从北门或南门离开'}
+                ],
+                highlights: '后母戊鼎（商代最大青铜器）、四羊方尊（商代青铜器精品）、金缕玉衣（汉代）、击鼓说唱俑（汉代）、孝端皇后凤冠（明代）、各种历代书画精品。B1层古代中国展是核心！',
+                tips_extra: '1. 必提前预约！节假日提前7天约。2. B1层古代中国展是精华，至少留2小时。3. 馆内可租讲解器（20元/2小时），强烈建议。4. 穿舒适鞋子（博物馆很大）。5. 馆内有餐厅但人多，建议吃饱再去或带零食。6. 禁止使用闪光灯和三脚架。7. 建议上午去，人相对少。8. 附近有地铁1号线（天安门东站）和2号线（前门站）。9. 和故宫步行仅10分钟，可安排在同一天。'
+            },
+            '天坛公园': {
+                tips: '⚠️ 天坛公园无需预约，现场购票即可。但建议买联票（含祈年殿/圜丘/回音壁），单买门票进不去核心景点。周一到周日均开放。',
+                ticket: '旺季（4.1-10.31）：门票15元/人，联票34元/人（含祈年殿20元+回音壁/圜丘20元）。淡季（11.1-3.31）：门票10元/人，联票28元/人。联票强烈推荐！60岁以上老人半价。',
+                entrance: '推荐从东门（天坛东路）或南门进入。地铁5号线天坛东门站。地址：东城区天坛东路。',
+                exit: '可从北门（近天坛北门地铁站）、南门或西门离开。建议不走回头路，从另一端离开。',
+                hours: '旺季（4.1-10.31）：公园6:00-22:00，核心景点（祈年殿等）8:00-18:00（17:30停止售票）。淡季（11.1-3.31）：公园6:30-22:00，核心景点8:00-17:00（16:30停止售票）。建议10:30-17:00之间游览核心景点。',
+                routeTitle: '天坛经典游览路线（约2-3小时）',
+                route: [
+                    {name: '东门（入口）', desc: '地铁5号线天坛东门站'},
+                    {name: '七星石', desc: '七块巨石，传说与风水有关'},
+                    {name: '祈年门', desc: '祈年殿正门，三重檐歇山顶'},
+                    {name: '祈年殿', desc: '天坛标志性建筑，三重檐圆形大殿，祈求丰收之处'},
+                    {name: '皇穹宇', desc: '存放祭天牌位之处'},
+                    {name: '回音壁', desc: '圆形围墙，两人分站两端可清晰听到对方说话'},
+                    {name: '圜丘', desc: '祭天台，三层汉白玉石台，天坛核心'},
+                    {name: '斋宫', desc: '皇帝祭天前斋戒之处'},
+                    {name: '南门（出口）', desc: '可步行至前门大街'}
+                ],
+                highlights: '祈年殿（天坛标志性建筑，三重檐圆形大殿）、回音壁（神奇声学效果）、圜丘（祭天台，三层汉白玉）、皇穹宇。联票必买！',
+                tips_extra: '1. 必买联票（34元），单买门票进不去祈年殿和圜丘。2. 穿舒适鞋子（公园很大，走1-2万步）。3. 祈年殿、圜丘是核心，各留30分钟以上。4. 回音壁人多时效果不好，建议错峰。5. 园内有简餐但选择少，建议吃饱再去。6. 建议从东门进南门出（或反之），不走回头路。7. 斋宫相对小众，人少安静。8. 附近有地铁5号线（天坛东门站）和8号线（天桥站）。'
+            },
+            '前门大街': {
+                tips: '✅ 步行街，免费开放，全天可逛。周末和节假日人流密集，注意保管随身物品。无需预约。',
+                ticket: '免费。各店铺消费另计。',
+                entrance: '推荐从北端（前门地铁站/天安门广场南侧）进入，向南逛。',
+                exit: '可走到南端（珠市口方向），或中途从任意路口离开。',
+                hours: '全天开放。店铺营业时间一般为9:00-22:00。',
+                routeTitle: '前门大街及大栅栏游览路线（约1.5-2小时）',
+                route: [
+                    {name: '正阳门箭楼', desc: '前门大街北端起点'},
+                    {name: '前门步行街', desc: '百年老街，步行游览'},
+                    {name: '全聚德烤鸭总店', desc: '1864年创立，烤鸭正宗'},
+                    {name: '大栅栏商业街', desc: '老字号聚集地'},
+                    {name: '瑞蚨祥绸布店', desc: '百年绸布老字号'},
+                    {name: '张一元茶庄', desc: '百年茶庄，茉莉花茶有名'},
+                    {name: '鲜鱼口美食街', desc: '小吃聚集，价格亲民'},
+                    {name: '北京坊', desc: '新式商业体，适合拍照'}
+                ],
+                highlights: '全聚德烤鸭总店（1864年老店）、大栅栏老字号群（瑞蚨祥、张一元、内联升等）、鲜鱼口美食街、北京坊（新式商业体）。',
+                tips_extra: '1. 全聚德烤鸭建议提前电话预约。2. 大栅栏有很多老字号特产店，适合买伴手礼。3. 北京坊适合拍照打卡，有MUJI HOTEL和PageOne书店。4. 小吃街价格偏高，体验为主。5. 从前门可步行到天安门广场（约10分钟）。'
+            },
+            '恭王府': {
+                tips: '✅ 2026年最新：恭王府已取消预约！可现场购票入园。但仍建议提前在"恭王府博物馆"公众号购票（提前10天放票），旺季可避免排队。周一闭馆（法定节假日除外）。',
+                ticket: '门票40元/人。讲解器租赁20元。60岁以上老人半价，6周岁以下儿童免费。',
+                entrance: '推荐从东门进入（前海西街）。南门也可进入。地址：西城区前海西街17号。',
+                exit: '从出口离开即可，东门或南门均可。',
+                hours: '旺季（4.1-10.31）：8:30-17:00（16:10停止售票）。淡季（11.1-3.31）：9:00-16:30（15:40停止售票）。周一闭馆。',
+                routeTitle: '恭王府经典游览路线（约2-3小时）',
+                route: [
+                    {name: '府门（入口）', desc: '恭王府正门'},
+                    {name: '银安殿', desc: '和珅客厅，王府核心建筑'},
+                    {name: '嘉乐堂', desc: '和珅书房'},
+                    {name: '后罩楼', desc: '和珅藏宝楼，111间房'},
+                    {name: '蝠池', desc: '形似蝙蝠的水池，寓意福气'},
+                    {name: '西洋门', desc: '汉白玉石门，王府唯一西洋建筑'},
+                    {name: '蝠厅', desc: '蝙蝠形状大厅，和珅会客厅'},
+                    {name: '秘云洞（福字碑）', desc: '康熙御笔福字，摸福沾福气'},
+                    {name: '大戏楼', desc: '清代戏台，曾为慈禧唱戏'}
+                ],
+                highlights: '福字碑（康熙御笔，摸福沾福气，排队人多）、西洋门（汉白玉石门，王府唯一西洋风格）、大戏楼（清代戏台）、后罩楼（和珅藏宝楼，111间房）、蝠池（蝙蝠形状水池）。',
+                tips_extra: '1. 福字碑是必看点，建议早去避免排队。2. 建议请讲解或使用语音导览（20元），了解和珅故事更有趣。3. 恭王府花园精美，值得细看。4. 附近有什刹海、南锣鼓巷，可顺路游览。5. 恭王府是"一座恭王府，半部清代史"，建议留足时间。'
+            },
+            '南锣鼓巷': {
+                tips: '✅ 免费开放，全天可逛，无需预约。周末和节假日人流密集，商业化程度较高。建议上午或工作日前往体验更好。',
+                ticket: '免费。',
+                entrance: '南口（鼓楼东大街，近地铁6号线南锣鼓巷站）或北口（地安门外大街）均可进入。',
+                exit: '随意。推荐逛完主街后逛两侧胡同，从烟袋斜街方向离开可到后海。',
+                hours: '全天开放。店铺营业时间一般为10:00-22:00。',
+                routeTitle: '南锣鼓巷及周边胡同游览路线（约1.5-2小时）',
+                route: [
+                    {name: '南口（鼓楼东大街）', desc: '地铁6号线南锣鼓巷站'},
+                    {name: '主街南段', desc: '特色小店、文创产品'},
+                    {name: '文宇奶酪店', desc: '老北京奶酪，推荐双皮奶'},
+                    {name: '创可贴8', desc: '北京文化T恤店'},
+                    {name: '主街北段', desc: '咖啡馆、餐厅'},
+                    {name: '帽儿胡同', desc: '两侧胡同之一，更安静'},
+                    {name: '雨儿胡同', desc: '齐白石故居在此'},
+                    {name: '烟袋斜街', desc: '通往后海/什刹海的胡同'},
+                    {name: '什刹海/后海', desc: '可顺路游览'}
+                ],
+                highlights: '特色小吃（文宇奶酪、创可贴8）、文艺小店、名人故居（齐白石故居在雨儿胡同）、烟袋斜街（通往后海）、两侧胡同（比主街安静）。',
+                tips_extra: '1. 主街人多且商业化，建议走两侧胡同更安静有韵味。2. 小吃价格偏高，随便吃一两家体验就好。3. 可以顺路走到什刹海/后海（约10分钟）。4. 附近有地铁6号线和8号线。5. 建议上午去，人少体验好。'
+            },
+            '军事博物馆': {
+                tips: '⚠️ 需提前在"中国人民革命军事博物馆"微信公众号预约。2026年最新：提前5天预约，每日8:00放票。免费参观。周一闭馆（法定节假日除外）。携带身份证原件。',
+                ticket: '免费（需预约）。',
+                entrance: '正门（复兴路9号）进入。地铁1号线军事博物馆站。',
+                exit: '原路返回正门离开。',
+                hours: '周二至周日9:00-17:00（16:00停止入馆）。周一闭馆。',
+                routeTitle: '军事博物馆游览路线（约2-3小时）',
+                route: [
+                    {name: '正门大厅', desc: '安检、取票/刷身份证入馆'},
+                    {name: '一层兵器馆', desc: '飞机、坦克、导弹等实物展示，最震撼'},
+                    {name: '二层土地革命战争馆', desc: '红军时期历史'},
+                    {name: '二层抗日战争馆', desc: '抗日战争历史'},
+                    {name: '三层解放战争馆', desc: '解放战争历史'},
+                    {name: '三层新中国国防建设馆', desc: '建国后国防发展'},
+                    {name: '四层兵器馆二层', desc: '更多武器装备展示'},
+                    {name: '中央大厅', desc: '大型武器装备，拍照打卡'}
+                ],
+                highlights: '一层兵器馆（最震撼，有真飞机坦克导弹）、东风21D导弹模型、各式飞机坦克舰艇实物、抗美援朝展区、中央大厅大型武器装备。',
+                tips_extra: '1. 兵器馆最精彩，有各种真武器，建议多留时间。2. 穿舒适鞋子（博物馆很大）。3. 馆内有简餐但选择少，建议吃饱再去。4. 附近就是玉渊潭公园，可顺路逛。5. 地铁1号线直达，交通便利。6. 建议提前在公众号填好参观人信息。'
+            },
+            '雍和宫': {
+                tips: '✅ 2026年最新：雍和宫已取消预约！可现场购票入园。无需提前预约。周一到周日均开放。着装得体，不可穿短裤、短裙、拖鞋入内。',
+                ticket: '门票25元/人。60岁以上老人半价。门口可免费领取香（每人3支），无需自带。',
+                entrance: '南门（正门）进入。地址：东城区雍和宫大街12号。地铁2号线/5号线雍和宫站。',
+                exit: '北门离开（通往国子监/孔庙方向）或原路从南门返回。',
+                hours: '旺季（4.1-10.31）：9:00-16:30。淡季（11.1-3.31）：9:00-16:00。全年无休。',
+                routeTitle: '雍和宫游览路线（约1.5-2小时）',
+                route: [
+                    {name: '牌坊', desc: '雍和宫前大型木牌坊'},
+                    {name: '昭泰门', desc: '第一道门'},
+                    {name: '天王殿', desc: '弥勒佛、四大天王'},
+                    {name: '雍和宫大殿', desc: '最大殿宇，三世佛'},
+                    {name: '永佑殿', desc: '无量寿佛等'},
+                    {name: '法轮殿', desc: '五百罗汉山，精美绝伦'},
+                    {name: '万福阁', desc: '18米高白檀木迈达拉佛，镇宫之宝'},
+                    {name: '绥成殿', desc: '最后一座殿宇'}
+                ],
+                highlights: '万福阁迈达拉佛（18米高白檀木大佛，镇宫之宝）、法轮殿五百罗汉山（精美绝伦）、雍和宫大殿（最大殿宇）、门口免费领香处。',
+                tips_extra: '1. 门口有免费领香处（每人3支），无需自带或购买。2. 殿内禁止拍照，请遵守规定。3. 着装得体，不可穿短裤、短裙、拖鞋。4. 出来可以去旁边的国子监/孔庙（步行5分钟）。5. 周边有很多素食餐厅。6. 雍和宫是藏传佛教寺院，可以请香祈福。'
+            },
+            '鸟巢': {
+                tips: '⚠️ 演唱会需持票入场。提前2小时到达场馆。可带少量水和食物。禁止带专业摄影器材、三脚架、激光笔等。禁止带打火机。',
+                ticket: '演唱会门票已通过正规渠道购买。外观免费（可在奥林匹克公园内远观拍照）。',
+                entrance: '根据票面标注的入口进入。通常为南侧（北辰东路）或东侧入口。地铁8号线奥体中心站B口出。',
+                exit: '演唱会结束后按现场指示从对应出口离开。散场人多，建议提前规划返程路线。',
+                hours: '演唱会时间：18:00-21:00（约3小时）。建议16:00到达。外观全天可看。',
+                routeTitle: '演唱会入场及观演流程',
+                route: [
+                    {name: '到达奥体中心', desc: '地铁8号线奥体中心站'},
+                    {name: '安检', desc: '提前2小时，排队安检'},
+                    {name: '检票', desc: '刷身份证+门票二维码'},
+                    {name: '找到看台区域', desc: '按票面区域找座位'},
+                    {name: '入座', desc: '演出前可拍照、逛周边'},
+                    {name: '演出开始', desc: '18:00正式开始'},
+                    {name: '演出结束', desc: '21:00左右结束'},
+                    {name: '有序离场', desc: '按指示从对应出口离开'}
+                ],
+                highlights: '五月天「5525+2 回到那一天」演唱会。鸟巢夜景灯光秀（演出前后）。奥林匹克公园夜景。',
+                tips_extra: '1. 穿舒适的鞋子（站立时间长）。2. 带薄外套（5月晚上可能凉）。3. 提前买好荧光棒（场内也可买但贵）。4. 地铁8号线奥体中心站最近。5. 散场人多，建议提前查好返程路线。6. 可带少量水和食物（不能带玻璃瓶）。7. 禁止带专业相机和三脚架。8. 建议提前在"国家体育场"公众号了解最新规定。'
+            },
+            '王府井': {
+                tips: '✅ 免费开放，全天可逛，无需预约。周末和节假日人流密集。注意保管好随身物品。建议错峰前往（上午或工作日下午）。',
+                ticket: '免费。各店铺消费另计。',
+                entrance: '北端（金鱼胡同地铁站/王府井大街北口）或南端（王府井地铁站）均可进入。',
+                exit: '随意。可从任意方向离开。',
+                hours: '全天开放。商场营业时间一般为10:00-22:00。',
+                routeTitle: '王府井大街游览路线（约1.5-2小时）',
+                route: [
+                    {name: '王府井大街北口', desc: '金鱼胡同地铁站'},
+                    {name: '新东安商场', desc: '苹果旗舰店在此'},
+                    {name: '王府井百货大楼', desc: '新中国第一店，1955年开业'},
+                    {name: '王府井小吃街', desc: '各种北京小吃'},
+                    {name: '东方新天地', desc: '大型购物中心'},
+                    {name: '稻香村', desc: '北京特产，伴手礼首选'},
+                    {name: '四季民福烤鸭', desc: '需排队，建议提前拿号'}
+                ],
+                highlights: '王府井百货大楼（新中国第一店，1955年开业）、新东安商场（苹果旗舰店）、东方新天地、王府井小吃街（烤鸭、糖葫芦等）、稻香村（北京特产伴手礼）。',
+                tips_extra: '1. 王府井小吃街价格偏贵，建议体验为主。2. 稻香村总店在王府井附近，买伴手礼方便（推荐京八件）。3. 四季民福烤鸭王府井店需要排队拿号，建议上午11点前去。4. 王府井步行街适合晚上逛，灯光漂亮。5. 附近有地铁1号线和8号线。'
+            },
+            '颐和园': {
+                tips: '⚠️ 建议提前在"颐和园"微信公众号或官网预约购票，旺季可现场购票但排队时间长。4-10月为旺季。携带身份证原件。',
+                ticket: '旺季（4.1-10.31）：门票30元/人，联票60元/人（含佛香阁10元+德和园5元+苏州街5元+文昌院5元）。淡季（11.1-3.31）：门票20元/人，联票50元/人。联票强烈推荐！60岁以上老人半价。',
+                entrance: '推荐从新建宫门（南门/南如意门）进入，游览路线顺畅。也可从东宫门（正门）进入。地址：海淀区新建宫门路19号。',
+                exit: '可从北宫门、东宫门或新建宫门离开。建议不走回头路。',
+                hours: '旺季（4.1-10.31）：6:00开园，18:30停止入园，20:30闭园。园内景点（佛香阁等）8:30-17:00。淡季（11.1-3.31）：6:30开园，18:00停止入园，19:00闭园。园内景点8:30-16:30。',
+                routeTitle: '颐和园经典游览路线（约3-4小时）',
+                route: [
+                    {name: '南如意门（入口）', desc: '御河游船码头附近进入'},
+                    {name: '昆明湖', desc: '中国最大的人工湖，沿湖游览'},
+                    {name: '十七孔桥', desc: '连接东堤和南湖岛，17个桥洞'},
+                    {name: '长廊', desc: '728米彩绘长廊，世界最长'},
+                    {name: '佛香阁', desc: '颐和园标志性建筑，俯瞰全园'},
+                    {name: '排云殿', desc: '慈禧太后庆寿之处'},
+                    {name: '石舫', desc: '汉白玉雕成的石船'},
+                    {name: '苏州街', desc: '仿江南水乡买卖街'},
+                    {name: '谐趣园', desc: '园中之园，仿无锡寄畅园'},
+                    {name: '东宫门（出口）', desc: '正门离开'}
+                ],
+                highlights: '佛香阁（颐和园标志性建筑，可俯瞰全园）、长廊（728米彩绘长廊）、昆明湖（中国最大人工湖）、十七孔桥、石舫、苏州街。联票必买！',
+                tips_extra: '1. 必买联票（60元），佛香阁是核心景点。2. 穿舒适运动鞋（全园很大，走2-3万步）。3. 佛香阁要爬台阶，留30分钟以上。4. 长廊适合拍照，建议晴天去。5. 昆明湖可租船（另收费）。6. 建议从南如意门进东宫门出，不走回头路。7. 园内有简餐但选择少，建议自带水和零食。8. 附近有地铁4号线（北宫门站/西苑站）。9. 从紫竹院码头坐船到南如意门是最佳入园方式。'
+            },
+            '紫竹院码头': {
+                tips: '✅ 御河游船（紫竹院-颐和园航线）需提前购票。2026年最新：可在"京河游船"公众号或现场购票。建议提前购票，旺季船票紧张。',
+                ticket: '单程票约60-80元/人（含讲解）。往返票约100-150元/人。已购票 ✅',
+                entrance: '紫竹院公园内紫御湾码头。地址：海淀区紫竹院路。地铁4号线/9号线国家图书馆站步行可达。',
+                exit: '游船到达颐和园南如意门码头，从南如意门进入颐和园。',
+                hours: '运营时间：9:00-16:00（旺季）。船程约30-40分钟。建议10:00左右出发，到达颐和园约10:30-11:00，下午有充足时间游览。',
+                routeTitle: '御河游船游览流程',
+                route: [
+                    {name: '到达紫竹院公园', desc: '从国家图书馆站步行至紫御湾码头'},
+                    {name: '检票登船', desc: '刷购票凭证登船'},
+                    {name: '长河水道', desc: '欣赏沿岸风景，听讲解'},
+                    {name: '到达南如意门', desc: '游船终点，进入颐和园'}
+                ],
+                highlights: '长河水道（皇家御河，慈禧太后水路去颐和园的路线）、沿途风景（北京西郊水道）、讲解服务（了解北京水系历史）。',
+                tips_extra: '1. 船票建议提前购买，旺季很抢手。2. 10:00出发最合适，到达颐和园正好中午开始游览。3. 船上可以拍照，但风大注意保暖。4. 码头停车位有限，建议公共交通前往。5. 如果遇到大风天气可能会停航，出发前确认。6. 从酒店到紫竹院码头可坐地铁4号线。'
+            },
+        };
+
+        function generateBezierCurve(start, end, curveAmount = 0.3) {
+            const dx = end[0] - start[0];
+            const dy = end[1] - start[1];
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            const midX = (start[0] + end[0]) / 2;
+            const midY = (start[1] + end[1]) / 2;
+            
+            const perpX = -dy / dist * dist * curveAmount;
+            const perpY = dx / dist * dist * curveAmount;
+            
+            const controlX = midX + perpX;
+            const controlY = midY + perpY;
+            
+            const points = [];
+            const steps = 50;
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const x = Math.pow(1 - t, 2) * start[0] + 2 * (1 - t) * t * controlX + Math.pow(t, 2) * end[0];
+                const y = Math.pow(1 - t, 2) * start[1] + 2 * (1 - t) * t * controlY + Math.pow(t, 2) * end[1];
+                points.push([x, y]);
+            }
+            return points;
+        }
+
+        
+        function initMaps() {
+            const dayConfigs = [
+                { id: 'day0', container: 'map-day1', center: [116.36, 39.91], zoom: 13 },
+                { id: 'day1', container: 'map-day2', center: [116.40, 39.95], zoom: 12 },
+                { id: 'day2', container: 'map-day3', center: [116.38, 39.93], zoom: 12 },
+                { id: 'day3', container: 'map-day4', center: [116.38, 39.91], zoom: 13 }
+            ];
+
+            let loadedCount = 0;
+            const totalConfigs = dayConfigs.length;
+
+            // Initialize all map instances first
+            dayConfigs.forEach(cfg => {
+                maps[cfg.id] = new AMap.Map(cfg.container, {
+                    zoom: cfg.zoom,
+                    center: cfg.center,
+                    zooms: [11, 15],
+                    mapStyle: 'amap://styles/light'
+                });
+                maps[cfg.id].setLimitBounds(new AMap.Bounds(
+                    [115.4, 39.4],
+                    [117.5, 41.1]
+                ));
+
+                addMarkers(maps[cfg.id], cfg.id);
+                allRoutes[cfg.id] = {};
+                activeRouteType[cfg.id] = null;
+            });
+
+            // Fetch routes sequentially across all days to strictly avoid QPS limits
+            (async () => {
+                for (const cfg of dayConfigs) {
+                    const routes = Object.entries(dayRoutes[cfg.id]);
+                    for (let [routeId, config] of routes) {
+                        await fetchRealRoute(cfg.id, routeId, config);
+                        await new Promise(r => setTimeout(r, 150)); // 150ms delay per request
+                    }
+                    loadedCount++;
+                    if (loadedCount === totalConfigs) {
+                        Object.values(maps).forEach(map => map.setFitView());
+                    }
+                }
+            })();
+        }
+
+        async function fetchRealRoute(dayId, routeId, config) {
+            const from = locations[config.from];
+            const to = locations[config.to];
+            const color = routeColors[config.type];
+            const dashArray = routeDashArrays[config.type];
+
+            let path = [];
+            let distText = '';
+            let durText = '';
+            let useBezier = false;
+            
+            if (config.type === 'cruise') {
+                useBezier = true; // For cruise, stick to bezier fallback
+            } else {
+                try {
+                    let originStr = `${from[0]},${from[1]}`;
+                    let destStr = `${to[0]},${to[1]}`;
+                    let apiType = config.type === 'walk' ? 'walking' : (config.type === 'subway' ? 'transit/integrated' : 'driving');
+                    let url = `/api/direction/${config.type}?origin=${originStr}&destination=${destStr}`;
+                    
+                    if (apiType === 'transit/integrated') {
+                        url += `&city=110000`;
+                    }
+                    
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data.status === '1' && data.route && ( (data.route.paths && data.route.paths.length > 0) || (data.route.transits && data.route.transits.length > 0) )) {
+                        if (apiType === 'transit/integrated' && data.route.transits && data.route.transits.length > 0) {
+                            console.log(`Real TRANSIT route loaded for ${routeId}`);
+                            const transit = data.route.transits[0];
+                            let distance = parseInt(transit.distance);
+                            let duration = parseInt(transit.duration);
+                            distText = (distance >= 1000) ? (distance/1000).toFixed(1) + '公里' : distance + '米';
+                            durText = Math.ceil(duration/60) + '分钟';
+                            
+                            // Parse transit segments
+                            transit.segments.forEach(segment => {
+                                if (segment.walking && segment.walking.steps) {
+                                    segment.walking.steps.forEach(step => {
+                                        step.polyline.split(';').forEach(point => {
+                                            let pts = point.split(',');
+                                            path.push(new AMap.LngLat(parseFloat(pts[0]), parseFloat(pts[1])));
+                                        });
+                                    });
+                                }
+                                if (segment.bus && segment.bus.buslines && segment.bus.buslines.length > 0) {
+                                    segment.bus.buslines[0].polyline.split(';').forEach(point => {
+                                        let pts = point.split(',');
+                                        path.push(new AMap.LngLat(parseFloat(pts[0]), parseFloat(pts[1])));
+                                    });
+                                }
+                            });
+                        } else {
+                            const bestPath = data.route.paths[0];
+                            console.log(`Real ${apiType} route loaded for ${routeId}`);
+                            let distance = parseInt(bestPath.distance);
+                            let duration = parseInt(bestPath.duration);
+                            distText = (distance >= 1000) ? (distance/1000).toFixed(1) + '公里' : distance + '米';
+                            durText = Math.ceil(duration/60) + '分钟';
+                            bestPath.steps.forEach(step => {
+                                step.polyline.split(';').forEach(point => {
+                                    let pts = point.split(',');
+                                    path.push(new AMap.LngLat(parseFloat(pts[0]), parseFloat(pts[1])));
+                                });
+                            });
+                        }
+                    } else {
+                        console.warn(`API returned no valid route for ${routeId}, status: ${data.status}, info: ${data.info}`);
+                        if (apiType === 'transit/integrated') {
+                            console.log(`Retrying ${routeId} with walking fallback...`);
+                            let fallbackUrl = `/api/direction/walk?origin=${originStr}&destination=${destStr}`;
+                            const fallbackRes = await fetch(fallbackUrl);
+                            const fallbackData = await fallbackRes.json();
+                            if (fallbackData.status === '1' && fallbackData.route && fallbackData.route.paths && fallbackData.route.paths.length > 0) {
+                                const bestPath = fallbackData.route.paths[0];
+                                bestPath.steps.forEach(step => {
+                                    step.polyline.split(';').forEach(point => {
+                                        let pts = point.split(',');
+                                        path.push(new AMap.LngLat(parseFloat(pts[0]), parseFloat(pts[1])));
+                                    });
+                                });
+                            } else {
+                                useBezier = true;
+                            }
+                        } else {
+                            useBezier = true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`Route ${routeId} API failed, using fallback:`, e);
+                    useBezier = true;
+                }
+            }
+
+            if (useBezier || path.length === 0) {
+                const bezierPath = generateBezierCurve(from, to, config.type === 'walk' || config.type === 'cruise' ? 0.2 : 0.3);
+                path = bezierPath.map(p => new AMap.LngLat(p[0], p[1]));
+            }
+
+            const polyline = new AMap.Polyline({
+                path: path,
+                strokeColor: color,
+                strokeWeight: config.type === 'walk' ? 3 : 5,
+                strokeOpacity: 0.8,
+                strokeDasharray: dashArray,
+                lineJoin: 'round',
+                lineCap: 'round',
+                borderWeight: 2,
+                borderColor: 'white',
+                borderOpacity: 0.8
+            });
+            maps[dayId].add(polyline);
+
+            // Add label
+            const midIndex = Math.floor(path.length / 2);
+            const midPoint = [path[midIndex].lng, path[midIndex].lat];
+
+            let labelIcon = '';
+            let labelText = '';
+            if (config.type === 'subway') {
+                labelIcon = '🚇';
+                labelText = durText || subwayInfo[routeId]?.time || '';
+            } else if (config.type === 'taxi') {
+                labelIcon = '🚗';
+                labelText = (distText && durText) ? `${distText} ${durText}` : `${taxiInfo[routeId]?.time || ''} ${taxiInfo[routeId]?.price || ''}`;
+            } else if (config.type === 'walk') {
+                labelIcon = '🚶';
+                labelText = (distText && durText) ? `${distText} ${durText}` : walkInfo[routeId]?.time || '';
+            } else if (config.type === 'cruise') {
+                labelIcon = '🚢';
+                labelText = `御河游船 ${cruiseInfo[routeId]?.time || ''} ${cruiseInfo[routeId]?.price || ''}`;
+            }
+
+            const labelDiv = document.createElement('div');
+            labelDiv.style.cssText = `
+                background: white;
+                border: 2px solid ${color};
+                border-radius: 20px;
+                padding: 5px 12px;
+                font-size: 12px;
+                color: #1c1917;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                white-space: nowrap;
+                font-weight: 600;
+            `;
+            labelDiv.textContent = `${labelIcon} ${labelText}`;
+
+            const labelMarker = new AMap.Marker({
+                position: new AMap.LngLat(midPoint[0], midPoint[1]),
+                content: labelDiv,
+                offset: new AMap.Pixel(-40, -15)
+            });
+            maps[dayId].add(labelMarker);
+
+            allRoutes[dayId][routeId] = {
+                polyline: polyline,
+                label: labelMarker,
+                type: config.type
+            };
+        }
+
+        function addMarkers(map, dayId) {
+            const markers = {
+                'day0': [
+                    { position: locations['北京西站'], title: '北京西站', icon: '🚄', color: '#0f766e' },
+                    { position: locations['宜尚酒店'], title: '宜尚酒店', icon: '🏨', color: '#0f766e' },
+                    { position: locations['中山公园'], title: '中山公园', icon: '🌳', color: '#10b981' },
+                    { position: locations['故宫'], title: '故宫', icon: '🏯', color: '#be123c' },
+                    { position: locations['天坛公园'], title: '天坛公园', icon: '⛩️', color: '#be123c' },
+                    { position: locations['前门大街'], title: '前门大街', icon: '🍜', color: '#d97706' }
+                ],
+                'day1': [
+                    { position: locations['宜尚酒店'], title: '宜尚酒店', icon: '🏨', color: '#0f766e' },
+                    { position: locations['紫竹院码头'], title: '紫御湾码头', icon: '⛴️', color: '#3b82f6' },
+                    { position: locations['颐和园'], title: '颐和园', icon: '🏯', color: '#d97706' },
+                    { position: locations['圆明园'], title: '圆明园（可选）', icon: '🏛️', color: '#10b981' },
+                    { position: locations['鸟巢'], title: '鸟巢', icon: '🎸', color: '#be123c' }
+                ],
+                'day2': [
+                    { position: locations['宜尚酒店'], title: '宜尚酒店', icon: '🏨', color: '#0f766e' },
+                    { position: locations['军事博物馆'], title: '军事博物馆', icon: '🎖️', color: '#be123c' },
+                    { position: locations['国家博物馆'], title: '国家博物馆', icon: '🏛️', color: '#d97706' },
+                    { position: locations['王府井'], title: '王府井', icon: '🛍️', color: '#10b981' }
+                ],
+                'day3': [
+                    { position: locations['宜尚酒店'], title: '宜尚酒店', icon: '🏨', color: '#0f766e' },
+                    { position: locations['恭王府'], title: '恭王府', icon: '🏯', color: '#d97706' },
+                    { position: locations['雍和宫'], title: '雍和宫', icon: '🛕', color: '#be123c' },
+                    { position: locations['清华北大'], title: '清华北大（可选）', icon: '🎓', color: '#10b981' },
+                    { position: locations['南锣鼓巷'], title: '南锣鼓巷', icon: '🚶', color: '#0f766e' },
+                    { position: locations['北京西站'], title: '北京西站', icon: '🚄', color: '#78716c' }
+                ]
+            };
+
+            markers[dayId].forEach(point => {
+                const content = document.createElement('div');
+                content.style.cssText = `width:36px;height:36px;border-radius:50%;background:${point.color};border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:transform 0.2s;`;
+                content.textContent = point.icon;
+                content.onmouseenter = () => content.style.transform = 'scale(1.15)';
+                content.onmouseleave = () => content.style.transform = 'scale(1)';
+
+                const marker = new AMap.Marker({ position: point.position, content, title: point.title });
+                map.add(marker);
+
+                const infoWindow = new AMap.InfoWindow({
+                    content: `<div style="padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13px;"><strong>${point.title}</strong></div>`,
+                    offset: new AMap.Pixel(0, -38)
+                });
+                marker.on('click', () => infoWindow.open(map, marker.getPosition()));
+            });
+        }
+
+        function highlightRoute(dayId, routeId, routeType) {
+            Object.entries(allRoutes[dayId]).forEach(([id, route]) => {
+                if (id === routeId) {
+                    route.polyline.setOptions({ strokeOpacity: 1, strokeWeight: 7 });
+                } else {
+                    route.polyline.setOptions({ strokeOpacity: 0.15 });
+                }
+            });
+            activeRouteType[dayId] = routeId;
+        }
+
+        function resetRoutes(dayId) {
+            Object.values(allRoutes[dayId]).forEach(route => {
+                route.polyline.setOptions({ strokeOpacity: 0.8, strokeWeight: route.type === 'walk' ? 3 : 5 });
+            });
+            activeRouteType[dayId] = null;
+        }
+
+        function showDay(index) {
+            document.querySelectorAll('.day-section').forEach((el, i) => el.classList.toggle('active', i === index));
+            document.querySelectorAll('.nav-btn').forEach((el, i) => el.classList.toggle('active', i === index));
+
+            Object.keys(maps).forEach(dayId => resetRoutes(dayId));
+            document.querySelectorAll('.transport-item.active').forEach(el => el.classList.remove('active'));
+
+            setTimeout(() => Object.values(maps).forEach(map => { map.resize(); map.setFitView(); }), 100);
+        }
+
+        document.querySelectorAll('.transport-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const dayId = this.dataset.day;
+                const routeId = this.dataset.route;
+
+                document.querySelectorAll(`.transport-item[data-day="${dayId}"]`).forEach(el => el.classList.remove('active'));
+
+                if (activeRouteType[dayId] === routeId) {
+                    resetRoutes(dayId);
+                } else {
+                    this.classList.add('active');
+                    highlightRoute(dayId, routeId, this.dataset.type);
+                }
+            });
+        });
+
+        window.onload = initMaps;
+
+        let spotMiniMap = null;
+        let spotMapRoute = null;
+        let spotMapMarkers = [];
+        let spotRoutePlanner = null;
+
+        function getPointAtRouteFraction(routeCoords, fraction) {
+            if (fraction <= 0) return routeCoords[0];
+            if (fraction >= 1) return routeCoords[routeCoords.length - 1];
+            
+            const totalSteps = routeCoords.length - 1;
+            const exactIndex = fraction * totalSteps;
+            const lowerIndex = Math.floor(exactIndex);
+            const upperIndex = Math.min(lowerIndex + 1, routeCoords.length - 1);
+            const ratio = exactIndex - lowerIndex;
+            
+            const lower = routeCoords[lowerIndex];
+            const upper = routeCoords[upperIndex];
+            
+            return [
+                lower[0] + (upper[0] - lower[0]) * ratio,
+                lower[1] + (upper[1] - lower[1]) * ratio
+            ];
+        }
+
+        async function initSpotMap(spotName) {
+            const coords = spotRouteCoords[spotName];
+            const details = spotDetails[spotName];
+            if (!coords) {
+                document.getElementById('spotMapContainer').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('spotMapContainer').style.display = 'block';
+
+            setTimeout(() => {
+                if (spotMiniMap) {
+                    spotMiniMap.destroy();
+                }
+
+                spotMiniMap = new AMap.Map('spotMiniMap', {
+                    center: coords.center,
+                    zoom: coords.zoom,
+                    zooms: [14, 18],
+                    viewMode: '2D',
+                    resizeEnable: true,
+                    mapStyle: 'amap://styles/light'
+                });
+
+                spotMiniMap.setLimitBounds(new AMap.Bounds(
+                    coords.bounds[0],
+                    coords.bounds[1]
+                ));
+
+                const routeSteps = details && details.route ? details.route : [];
+
+                // 显示景点内部游览路线（尝试使用真实的步行路径规划）
+                if (coords.route && coords.route.length > 1) {
+                    const initialPath = coords.route.map(p => new AMap.LngLat(p[0], p[1]));
+                    spotMapRoute = new AMap.Polyline({
+                        path: initialPath,
+                        strokeColor: '#c2410c',
+                        strokeWeight: 5,
+                        strokeOpacity: 0.85,
+                        strokeDasharray: [8, 4],
+                        lineJoin: 'round',
+                        lineCap: 'round',
+                        borderWeight: 2,
+                        borderColor: 'rgba(255,255,255,0.8)',
+                        borderOpacity: 0.9,
+                        zIndex: 10
+                    });
+                    spotMiniMap.add(spotMapRoute);
+
+                    // 异步获取每两个点之间的真实步行路线 (带取消检查)
+                    const currentMiniMap = spotMiniMap;
+                    (async () => {
+                        let fullPath = [];
+                        
+                        for (let i = 0; i < coords.route.length - 1; i++) {
+                            // 检查地图是否已被关闭/切换
+                            if (!spotMiniMap || spotMiniMap !== currentMiniMap) return;
+
+                            let from = coords.route[i];
+                            let to = coords.route[i+1];
+                            let originStr = `${from[0].toFixed(6)},${from[1].toFixed(6)}`;
+                            let destStr = `${to[0].toFixed(6)},${to[1].toFixed(6)}`;
+                            let url = `/api/direction/walk?origin=${originStr}&destination=${destStr}`;
+                            
+                            let segmentPath = [];
+                            try {
+                                const response = await fetch(url);
+                                const data = await response.json();
+                                if (data.status === '1' && data.route && data.route.paths && data.route.paths.length > 0) {
+                                    const bestPath = data.route.paths[0];
+                                    if (bestPath.steps) {
+                                        bestPath.steps.forEach(step => {
+                                            step.polyline.split(';').forEach(point => {
+                                                let pts = point.split(',');
+                                                if (pts.length === 2) {
+                                                    let lng = parseFloat(pts[0]);
+                                                    let lat = parseFloat(pts[1]);
+                                                    if (!isNaN(lng) && !isNaN(lat)) {
+                                                        segmentPath.push(new AMap.LngLat(lng, lat));
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn(`Spot API failed for segment ${i}:`, e);
+                            }
+
+                            if (segmentPath.length < 2) {
+                                segmentPath = [new AMap.LngLat(from[0], from[1]), new AMap.LngLat(to[0], to[1])];
+                            }
+
+                            if (i === 0) fullPath = segmentPath;
+                            else fullPath = fullPath.concat(segmentPath.slice(1));
+                            
+                            const currentDisplayPath = fullPath.concat(
+                                coords.route.slice(i + 1).map(p => new AMap.LngLat(p[0], p[1]))
+                            );
+                            
+                            if (spotMapRoute && currentDisplayPath.length > 0) {
+                                spotMapRoute.setPath(currentDisplayPath);
+                            }
+                        }
+                    })();
+
+                    // 如果有详细的景点步骤，添加编号标记和标签
+                    if (routeSteps && routeSteps.length >= 2) {
+                        for (let i = 0; i < routeSteps.length; i++) {
+                            const fraction = routeSteps.length === 1 ? 0 : i / (routeSteps.length - 1);
+                            const point = getPointAtRouteFraction(coords.route, fraction);
+                            const step = routeSteps[i];
+                            
+                            // 创建带编号的圆形标记
+                            const markerDiv = document.createElement('div');
+                            markerDiv.style.cssText = `
+                                width: 26px;
+                                height: 26px;
+                                border-radius: 50%;
+                                background: linear-gradient(135deg, #ea580c, #c2410c);
+                                border: 3px solid white;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 12px;
+                                font-weight: 800;
+                                color: white;
+                                font-family: Arial, sans-serif;
+                            `;
+                            markerDiv.textContent = (i + 1).toString();
+                            
+                            const marker = new AMap.Marker({
+                                position: new AMap.LngLat(point[0], point[1]),
+                                content: markerDiv,
+                                offset: new AMap.Pixel(-13, -13),
+                                zIndex: 100,
+                                clickable: true
+                            });
+                            spotMiniMap.add(marker);
+                            spotMapMarkers.push(marker);
+                            
+                            // 添加景点名称标签
+                            const labelDiv = document.createElement('div');
+                            labelDiv.style.cssText = `
+                                background: white;
+                                color: #1c1917;
+                                font-size: 11px;
+                                padding: 4px 8px;
+                                border-radius: 6px;
+                                border: 2px solid #ea580c;
+                                font-weight: 700;
+                                white-space: nowrap;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                                font-family: Arial, sans-serif;
+                            `;
+                            labelDiv.textContent = step.name;
+                            
+                            const label = new AMap.Text({
+                                text: '',
+                                position: new AMap.LngLat(point[0], point[1]),
+                                content: labelDiv,
+                                offset: new AMap.Pixel(18, -13),
+                                zIndex: 101
+                            });
+                            spotMiniMap.add(label);
+                            spotMapMarkers.push(label);
+                        }
+                    } else {
+                        // 没有详细步骤时，显示入口和出口标记
+                        const entranceDiv = document.createElement('div');
+                        entranceDiv.style.cssText = `
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            background: #16a34a;
+                            border: 3px solid white;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 14px;
+                        `;
+                        entranceDiv.textContent = '🚶';
+                        
+                        const entranceMarker = new AMap.Marker({
+                            position: new AMap.LngLat(coords.route[0][0], coords.route[0][1]),
+                            content: entranceDiv,
+                            offset: new AMap.Pixel(-15, -15),
+                            zIndex: 100
+                        });
+                        spotMiniMap.add(entranceMarker);
+                        spotMapMarkers.push(entranceMarker);
+
+                        const entranceLabelDiv = document.createElement('div');
+                        entranceLabelDiv.style.cssText = `
+                            background: #16a34a;
+                            color: white;
+                            font-size: 11px;
+                            padding: 4px 8px;
+                            border-radius: 6px;
+                            font-weight: 700;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                            font-family: Arial, sans-serif;
+                        `;
+                        entranceLabelDiv.textContent = '入口';
+                        
+                        const entranceLabel = new AMap.Text({
+                            text: '',
+                            position: new AMap.LngLat(coords.route[0][0], coords.route[0][1]),
+                            content: entranceLabelDiv,
+                            offset: new AMap.Pixel(18, -10),
+                            zIndex: 101
+                        });
+                        spotMiniMap.add(entranceLabel);
+                        spotMapMarkers.push(entranceLabel);
+
+                        const exitDiv = document.createElement('div');
+                        exitDiv.style.cssText = `
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            background: #dc2626;
+                            border: 3px solid white;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 14px;
+                        `;
+                        exitDiv.textContent = '🏁';
+                        
+                        const exitMarker = new AMap.Marker({
+                            position: new AMap.LngLat(coords.route[coords.route.length-1][0], coords.route[coords.route.length-1][1]),
+                            content: exitDiv,
+                            offset: new AMap.Pixel(-15, -15),
+                            zIndex: 100
+                        });
+                        spotMiniMap.add(exitMarker);
+                        spotMapMarkers.push(exitMarker);
+
+                        const exitLabelDiv = document.createElement('div');
+                        exitLabelDiv.style.cssText = `
+                            background: #dc2626;
+                            color: white;
+                            font-size: 11px;
+                            padding: 4px 8px;
+                            border-radius: 6px;
+                            font-weight: 700;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                            font-family: Arial, sans-serif;
+                        `;
+                        exitLabelDiv.textContent = '出口';
+                        
+                        const exitLabel = new AMap.Text({
+                            text: '',
+                            position: new AMap.LngLat(coords.route[coords.route.length-1][0], coords.route[coords.route.length-1][1]),
+                            content: exitLabelDiv,
+                            offset: new AMap.Pixel(18, -10),
+                            zIndex: 101
+                        });
+                        spotMiniMap.add(exitLabel);
+                        spotMapMarkers.push(exitLabel);
+                    }
+                }
+
+                spotMiniMap.setFitView();
+
+                setTimeout(() => {
+                    spotMiniMap.resize();
+                    spotMiniMap.setFitView();
+                }, 350);
+            }, 100);
+        }
+
+        function destroySpotMap() {
+            if (spotMiniMap) {
+                spotMiniMap.destroy();
+                spotMiniMap = null;
+            }
+            spotRoutePlanner = null;
+            spotMapRoute = null;
+            spotMapMarkers = [];
+            document.getElementById('spotMapContainer').style.display = 'none';
+        }
+
+        // Spot detail modal
+        function openSpotModal(spotName) {
+            const spot = spotDetails[spotName];
+            if (!spot) return;
+
+            document.getElementById('spotModalTitle').textContent = spotName + ' 游览攻略';
+
+            let html = '';
+
+            if (spot.tips) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">注意事项</div>';
+                html += '<div class="spot-tip-box">' + spot.tips + '</div>';
+                html += '</div>';
+            }
+
+            if (spot.ticket) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">门票信息</div>';
+                html += '<div class="spot-info-content"><p>' + spot.ticket + '</p></div></div>';
+            }
+
+            if (spot.hours) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">开放时间</div>';
+                html += '<div class="spot-info-content"><p>' + spot.hours + '</p></div></div>';
+            }
+
+            if (spot.entrance || spot.exit) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">入口与出口</div>';
+                html += '<div class="spot-info-content">';
+                if (spot.entrance) html += '<p><strong>入口：</strong>' + spot.entrance + '</p>';
+                if (spot.exit) html += '<p><strong>出口：</strong>' + spot.exit + '</p>';
+                html += '</div></div>';
+            }
+
+            if (spot.route) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">' + (spot.routeTitle || '推荐游览路线') + '</div>';
+                html += '<div class="spot-info-content">';
+                if (Array.isArray(spot.route)) {
+                    spot.route.forEach((step, i) => {
+                        html += '<div style="display:flex;align-items:flex-start;gap:0.8rem;margin-bottom:0.8rem;">';
+                        html += '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">';
+                        html += '<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;">' + (i + 1) + '</div>';
+                        if (i < spot.route.length - 1) html += '<div style="width:2px;flex:1;background:var(--border);min-height:20px;"></div>';
+                        html += '</div>';
+                        html += '<div style="flex:1;padding-top:4px;">';
+                        html += '<div style="font-weight:600;font-size:0.9rem;color:var(--ink);">' + step.name + '</div>';
+                        if (step.desc) html += '<div style="font-size:0.82rem;color:var(--stone);margin-top:2px;">' + step.desc + '</div>';
+                        html += '</div></div>';
+                    });
+                } else {
+                    const steps = spot.route.split(' → ');
+                    html += '<div class="spot-route">';
+                    steps.forEach((step, i) => {
+                        html += '<span class="spot-route-step">' + step + '</span>';
+                        if (i < steps.length - 1) html += '<span class="spot-route-arrow">→</span>';
+                    });
+                    html += '</div>';
+                }
+                html += '</div></div>';
+            }
+
+            if (spot.highlights) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">必看亮点</div>';
+                html += '<div class="spot-info-content"><p>' + spot.highlights + '</p></div></div>';
+            }
+
+            if (spot.tips_extra) {
+                html += '<div class="spot-info-section">';
+                html += '<div class="spot-info-title">实用小贴士</div>';
+                html += '<div class="spot-info-content">' + spot.tips_extra.split(/(?<=\d\.\s)/).filter(p => p.trim()).map(p => '<p style="margin-bottom:0.3rem;">' + p.trim() + '</p>').join('') + '</div></div>';
+            }
+
+            document.getElementById('spotContent').innerHTML = html;
+            document.getElementById('spotModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(function() {
+                initSpotMap(spotName);
+            }, 200);
+        }
+
+        function closeSpotModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            destroySpotMap();
+            document.getElementById('spotModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Keyboard support for modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSpotModal();
+            }
+        });
+
+        // Click handler for timeline items
+        function initTimelineClicks() {
+            document.querySelectorAll('.timeline-item.clickable').forEach(item => {
+                item.addEventListener('click', function() {
+                    // 优先使用 data-name 属性（如果已设置）
+                    let spotName = this.dataset.name;
+                    if (!spotName) {
+                        spotName = this.querySelector('.timeline-content').textContent.trim();
+                        // 提取括号前的主景点名，如 "故宫（中山公园→端门→午门进）" → "故宫"
+                        if (spotName.includes('（')) {
+                            spotName = spotName.split('（')[0].trim();
+                        }
+                        // Handle special cases
+                        if (spotName === '鸟巢演唱会') spotName = '鸟巢';
+                        if (spotName.includes('南锣鼓巷')) spotName = '南锣鼓巷';
+                        if (spotName.includes('清华') && spotName.includes('北大')) spotName = '清华北大';
+                    }
+                    openSpotModal(spotName);
+                });
+            });
+        }
+
+        // Init timeline clicks after page load
+        window.addEventListener('load', function() {
+            setTimeout(initTimelineClicks, 100);
+        });
+    </script>
+</body>
+</html>
