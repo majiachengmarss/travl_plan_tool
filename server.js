@@ -6,8 +6,8 @@ const PORT = 3000;
 // 你的高德 Web 服务 API Key
 const AMAP_KEY = '166024ccfc790fbdddda3fb8c3de0027';
 
-// 托管静态文件
-app.use(express.static(__dirname));
+// 托管前端构建文件
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 // 天气 API 代理
 app.get('/api/weather', async (req, res) => {
@@ -42,8 +42,17 @@ app.get('/api/direction/:type', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'beijing-travel-guide.html'));
+
+// 静态数据接口
+app.get('/api/itinerary/:id', (req, res) => {
+    const filePath = path.join(__dirname, 'data', `${req.params.id}.json`);
+    res.sendFile(filePath, err => {
+        if (err) res.status(404).json({ error: 'Itinerary not found' });
+    });
+});
+
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
