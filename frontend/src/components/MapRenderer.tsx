@@ -72,25 +72,51 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
       }
     };
 
-    // Draw timeline markers first
+    // Determine ordered locations from timeline
+    const timelineLocs: string[] = [];
     day.timeline.forEach(item => {
-        // the item.event might be the location name or include the location name
-        // for simplicity, if allLocations[item.event] exists, draw it
-        // Or if item.spot exists, draw that
-        const locName = item.spot || item.event;
-        drawMarker(locName);
+      let locName = item.spot;
+      if (!locName) {
+        for (const key of Object.keys(allLocations)) {
+          if (item.event.includes(key)) {
+            locName = key;
+            break; // Find the first matching location
+          }
+        }
+      }
+      if (locName && allLocations[locName]) {
+        // Prevent consecutive duplicates
+        if (timelineLocs.length === 0 || timelineLocs[timelineLocs.length - 1] !== locName) {
+          timelineLocs.push(locName);
+        }
+      }
     });
 
-    // Sequentially fetch and draw routes to avoid API limits
+    // Draw all extracted timeline markers
+    timelineLocs.forEach(loc => drawMarker(loc));
+
+    // Sequentially fetch and draw routes between the ordered timeline locations
     let isCancelled = false;
     const drawRoutes = async () => {
-      for (const transport of day.transports || []) {
+      for (let i = 0; i < timelineLocs.length - 1; i++) {
         if (isCancelled) return;
-        const bestOption = transport.options.find((o: any) => o.recommended) || transport.options[0];
-        if (!bestOption) continue;
+        const fromName = timelineLocs[i];
+        const toName = timelineLocs[i+1];
 
-        drawMarker(bestOption.from);
-        drawMarker(bestOption.to);
+        let bestOption: any = null;
+        if (day.transports) {
+          const transport = day.transports.find((t: any) => 
+            t.options.some((o: any) => o.from === fromName && o.to === toName)
+          );
+          if (transport) {
+            bestOption = transport.options.find((o: any) => o.recommended) || transport.options[0];
+          }
+        }
+
+        // Auto-plan for newly added spots: default to driving, or walk if very close
+        if (!bestOption) {
+          bestOption = { type: 'taxi', from: fromName, to: toName };
+        }
 
         const fromCoords = allLocations[bestOption.from];
         const toCoords = allLocations[bestOption.to];
@@ -100,7 +126,7 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
            if (isCancelled) return;
 
            const amapPath = path.map(p => new window.AMap.LngLat(p[0], p[1]));
-           const color = routeColors[bestOption.type] || '#c2410c';
+           const color = routeColors[bestOption.type] || '#f59e0b'; // default taxi color
            const dashArray = routeDashArrays[bestOption.type] || [];
 
            const polyline = new window.AMap.Polyline({
