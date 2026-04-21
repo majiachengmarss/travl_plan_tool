@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import type { DayPlan } from '../types';
-import { fetchRoutePoints } from '../utils/amap';
 
 interface MapRendererProps {
   day: DayPlan;
@@ -80,81 +79,53 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
         for (const key of Object.keys(allLocations)) {
           if (item.event.includes(key)) {
             locName = key;
-            break; // Find the first matching location
+            break;
           }
         }
       }
       if (locName && allLocations[locName]) {
-        // Prevent consecutive duplicates
         if (timelineLocs.length === 0 || timelineLocs[timelineLocs.length - 1] !== locName) {
           timelineLocs.push(locName);
         }
       }
     });
 
-    // Draw all extracted timeline markers
     timelineLocs.forEach(loc => drawMarker(loc));
 
-    // Sequentially fetch and draw routes between the ordered timeline locations
-    let isCancelled = false;
+    // Draw routes directly from day.transports which are now pre-calculated by scheduleEngine
     const drawRoutes = async () => {
-      for (let i = 0; i < timelineLocs.length - 1; i++) {
-        if (isCancelled) return;
-        const fromName = timelineLocs[i];
-        const toName = timelineLocs[i+1];
+      if (!day.transports) return;
 
-        let bestOption: any = null;
-        if (day.transports) {
-          const transport = day.transports.find((t: any) => 
-            t.options.some((o: any) => o.from === fromName && o.to === toName)
-          );
-          if (transport) {
-            bestOption = transport.options.find((o: any) => o.recommended) || transport.options[0];
-          }
-        }
+      for (const transport of day.transports) {
+         const bestOption = transport.options.find((o: any) => o.recommended) || transport.options[0];
+         if (!bestOption || !bestOption.path) continue;
 
-        // Auto-plan for newly added spots: default to driving, or walk if very close
-        if (!bestOption) {
-          bestOption = { type: 'taxi', from: fromName, to: toName };
-        }
+         const amapPath = bestOption.path.map((p: any) => new window.AMap.LngLat(p[0], p[1]));
+         const color = routeColors[bestOption.type] || '#f59e0b';
+         const dashArray = routeDashArrays[bestOption.type] || [];
 
-        const fromCoords = allLocations[bestOption.from];
-        const toCoords = allLocations[bestOption.to];
+         const polyline = new window.AMap.Polyline({
+             path: amapPath,
+             strokeColor: color,
+             strokeWeight: bestOption.type === 'walk' ? 3 : 5,
+             strokeOpacity: 0.8,
+             strokeDasharray: dashArray,
+             lineJoin: 'round',
+             lineCap: 'round',
+             borderWeight: 2,
+             borderColor: 'white',
+             borderOpacity: 0.8
+         });
 
-        if (fromCoords && toCoords) {
-           const { path } = await fetchRoutePoints(fromCoords, toCoords, bestOption.type);
-           if (isCancelled) return;
-
-           const amapPath = path.map(p => new window.AMap.LngLat(p[0], p[1]));
-           const color = routeColors[bestOption.type] || '#f59e0b'; // default taxi color
-           const dashArray = routeDashArrays[bestOption.type] || [];
-
-           const polyline = new window.AMap.Polyline({
-               path: amapPath,
-               strokeColor: color,
-               strokeWeight: bestOption.type === 'walk' ? 3 : 5,
-               strokeOpacity: 0.8,
-               strokeDasharray: dashArray,
-               lineJoin: 'round',
-               lineCap: 'round',
-               borderWeight: 2,
-               borderColor: 'white',
-               borderOpacity: 0.8
-           });
-
-           map.add(polyline);
-           await new Promise(r => setTimeout(r, 150)); // small delay for QPS
-        }
+         map.add(polyline);
       }
-      if (!isCancelled) {
-          map.setFitView();
-      }
+      map.setFitView();
     };
 
     drawRoutes();
 
     return () => {
-      isCancelled = true;
+      // Cleanup
     };
   }, [day.transports, allLocations]); // Re-draw when transports change
 

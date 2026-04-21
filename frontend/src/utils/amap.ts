@@ -33,14 +33,18 @@ export async function fetchRoutePoints(
   from: [number, number],
   to: [number, number],
   type: string
-): Promise<{ path: [number, number][]; distanceText: string; durationText: string; useBezier: boolean }> {
+): Promise<{ path: [number, number][]; distanceText: string; durationText: string; durationMinutes: number; priceText?: string; desc?: string; useBezier: boolean }> {
   let path: [number, number][] = [];
   let distText = '';
   let durText = '';
+  let durationMinutes = 0;
+  let priceText = '';
+  let desc = '';
   let useBezier = false;
 
   if (type === 'cruise') {
     useBezier = true;
+    durationMinutes = 30;
   } else {
     try {
       const originStr = `${from[0]},${from[1]}`;
@@ -56,9 +60,12 @@ export async function fetchRoutePoints(
           const transit = data.route.transits[0];
           const distance = parseInt(transit.distance || '0');
           const duration = parseInt(transit.duration || '0');
+          durationMinutes = Math.ceil(duration / 60);
           distText = distance >= 1000 ? (distance / 1000).toFixed(1) + '公里' : distance + '米';
-          durText = Math.ceil(duration / 60) + '分钟';
-
+          durText = durationMinutes + '分钟';
+          priceText = (transit.cost || '4') + '元';
+          
+          let segmentsNames: string[] = [];
           transit.segments.forEach((segment: any) => {
             if (segment.walking && segment.walking.steps) {
               segment.walking.steps.forEach((step: any) => {
@@ -69,18 +76,25 @@ export async function fetchRoutePoints(
               });
             }
             if (segment.bus && segment.bus.buslines && segment.bus.buslines.length > 0) {
-              segment.bus.buslines[0].polyline.split(';').forEach((point: string) => {
+              const busline = segment.bus.buslines[0];
+              segmentsNames.push(busline.name.split('(')[0]);
+              busline.polyline.split(';').forEach((point: string) => {
                 const pts = point.split(',');
                 path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
               });
             }
           });
+          desc = segmentsNames.join('→') || '公交/地铁路线';
         } else if (data.route.paths && data.route.paths.length > 0) {
           const bestPath = data.route.paths[0];
           const distance = parseInt(bestPath.distance || '0');
           const duration = parseInt(bestPath.duration || '0');
+          durationMinutes = Math.ceil(duration / 60);
           distText = distance >= 1000 ? (distance / 1000).toFixed(1) + '公里' : distance + '米';
-          durText = Math.ceil(duration / 60) + '分钟';
+          durText = durationMinutes + '分钟';
+          if (type === 'taxi') {
+             priceText = '约' + Math.max(13, Math.ceil(distance/1000 * 3)) + '元';
+          }
 
           bestPath.steps.forEach((step: any) => {
             step.polyline.split(';').forEach((point: string) => {
@@ -97,6 +111,10 @@ export async function fetchRoutePoints(
           const fallbackData = await fallbackRes.json();
           if (fallbackData.status === '1' && fallbackData.route && fallbackData.route.paths && fallbackData.route.paths.length > 0) {
             const bestPath = fallbackData.route.paths[0];
+            const duration = parseInt(bestPath.duration || '0');
+            durationMinutes = Math.ceil(duration / 60);
+            durText = durationMinutes + '分钟';
+            desc = '距离较近，建议步行';
             bestPath.steps.forEach((step: any) => {
               step.polyline.split(';').forEach((point: string) => {
                 const pts = point.split(',');
@@ -118,7 +136,72 @@ export async function fetchRoutePoints(
 
   if (useBezier || path.length === 0) {
     path = generateBezierCurve(from, to, type === 'walk' || type === 'cruise' ? 0.2 : 0.3);
+    if (!durationMinutes) durationMinutes = 20; // Default fallback duration
+    durText = durText || (durationMinutes + '分钟');
   }
 
-  return { path, distanceText: distText, durationText: durText, useBezier };
+  return { path, distanceText: distText, durationText: durText, durationMinutes, priceText, desc, useBezier };
+}
+
+export async function fetchTransportOptions(fromName: string, toName: string, fromCoords: [number, number], toCoords: [number, number]) {
+    const idPrefix = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    const options = [];
+    
+    // Default: try fetching taxi and subway concurrently
+    const [subwayRes, taxiRes] = await Promise.all([
+       fetchRoutePoints(fromCoords, toCoords, 'subway'),
+       fetchRoutePoints(fromCoords, toCoords, 'taxi')
+    ]);
+    
+    // Construct Subway Option
+    if (subwayRes.durationMinutes > 0) {
+        options.push({
+           id: idPrefix + '-subway',
+           type: subwayRes.desc?.includes('步行') ? 'walk' : 'subway',
+           from: fromName,
+           to: toName,
+           desc: subwayRes.desc || '公交/地铁',
+           details: [
+              `⏱️ ${subwayRes.durationText}`,
+              subwayRes.priceText ? `💰 ${subwayRes.priceText}` : '',
+              subwayRes.distanceText ? `📍 ${subwayRes.distanceText}` : ''
+           ].filter(Boolean),
+           recommended: subwayRes.durationMinutes <= taxiRes.durationMinutes + 10, // Recommend subway if it's not much slower than taxi
+           path: subwayRes.path
+        });
+    }
+    
+    // Construct Taxi Option
+    if (taxiRes.durationMinutes > 0) {
+        options.push({
+           id: idPrefix + '-taxi',
+           type: 'taxi',
+           from: fromName,
+           to: toName,
+           desc: taxiRes.distanceText ? `约${taxiRes.distanceText}` : '打车',
+           details: [
+              `⏱️ 约${taxiRes.durationText}`,
+              taxiRes.priceText ? `💰 ${taxiRes.priceText}` : ''
+           ].filter(Boolean),
+           recommended: options.length === 0 || taxiRes.durationMinutes < subwayRes.durationMinutes - 10,
+           path: taxiRes.path
+        });
+    }
+    
+    // If both failed, add a fallback walk
+    if (options.length === 0) {
+        const walkRes = await fetchRoutePoints(fromCoords, toCoords, 'walk');
+        options.push({
+            id: idPrefix + '-walk',
+            type: 'walk',
+            from: fromName,
+            to: toName,
+            desc: '步行或骑行',
+            details: [`⏱️ 约${walkRes.durationText}`],
+            recommended: true,
+            path: walkRes.path
+        });
+    }
+    
+    return options;
 }

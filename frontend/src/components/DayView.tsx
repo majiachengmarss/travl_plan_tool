@@ -3,7 +3,8 @@ import type { DayPlan } from '../types';
 import { TimelineEditor } from './TimelineEditor';
 import { MapRenderer } from './MapRenderer';
 import { SpotModal } from './SpotModal';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, Loader2 } from 'lucide-react';
+import { autoSchedule } from '../utils/scheduleEngine';
 
 interface DayViewProps {
   day: DayPlan;
@@ -15,10 +16,32 @@ interface DayViewProps {
 
 export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }: DayViewProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<string | null>(null);
 
+  const handleTimelineChange = async (newTimeline: any[]) => {
+    setIsScheduling(true);
+    const updatedDay = { ...day, timeline: newTimeline };
+    try {
+        const scheduledDay = await autoSchedule(updatedDay, allLocations, allSpots);
+        onChange(scheduledDay);
+    } catch (e) {
+        console.error("Auto scheduling failed", e);
+        onChange(updatedDay);
+    } finally {
+        setIsScheduling(false);
+    }
+  };
+
   return (
-    <div className="slide-up animate-in fade-in duration-500">
+    <div className="slide-up animate-in fade-in duration-500 relative">
+      {isScheduling && (
+         <div className="absolute inset-0 z-50 bg-white/50 backdrop-blur-[2px] rounded-3xl flex flex-col items-center justify-center">
+            <Loader2 className="animate-spin text-accent mb-2" size={32} />
+            <span className="text-sm font-bold text-stone">正在由高德大脑智能规划全新路线与时间...</span>
+         </div>
+      )}
+
       {selectedSpot && allSpots[selectedSpot] && (
         <SpotModal 
            spotName={selectedSpot} 
@@ -38,7 +61,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
              onClick={() => setIsEditing(!isEditing)}
              className="px-4 py-1.5 bg-accent text-white text-sm font-medium rounded shadow-sm hover:bg-rose-700 transition"
            >
-             {isEditing ? '保存修改' : '编辑行程'}
+             {isEditing ? '退出编辑' : '编辑行程'}
            </button>
         </div>
       </div>
@@ -57,10 +80,36 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
                   items={day.timeline} 
                   isEditing={isEditing} 
                   onSpotClick={(spotName) => setSelectedSpot(spotName)}
-                  onChange={(newTimeline) => onChange({ ...day, timeline: newTimeline })}
+                  onChange={handleTimelineChange}
                   onLocationAdd={onLocationAdd}
                />
             </div>
+
+            {day.transports && day.transports.length > 0 && (
+               <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+                  <div className="text-xs font-bold tracking-widest uppercase text-stone mb-4">
+                     交通建议 (Auto-Routed)
+                  </div>
+                  <div className="flex flex-col gap-4">
+                     {day.transports.map((t: any, i: number) => {
+                         const best = t.options.find((o:any) => o.recommended) || t.options[0];
+                         return (
+                            <div key={i} className="flex flex-col gap-2 p-3 bg-cream rounded-xl border border-border">
+                               <div className="text-xs font-bold text-stone">{t.title}</div>
+                               <div className="flex items-center gap-2 text-sm">
+                                  <span className="px-2 py-0.5 bg-white rounded border border-border">{best.type === 'subway' ? '🚇' : (best.type==='walk' ? '🚶' : '🚗')} {best.desc}</span>
+                               </div>
+                               <div className="flex flex-wrap gap-2 text-xs text-stone mt-1">
+                                  {best.details.map((d: string, idx: number) => (
+                                      <span key={idx}>{d}</span>
+                                  ))}
+                               </div>
+                            </div>
+                         );
+                     })}
+                  </div>
+               </div>
+            )}
 
             {day.tickets && day.tickets.length > 0 && (
                <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
@@ -68,7 +117,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
                      门票信息
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                     {day.tickets.map((ticket, i) => (
+                     {day.tickets.map((ticket: any, i: number) => (
                         <div key={i} className="flex flex-col gap-1 p-3 bg-cream rounded-xl">
                            <span className="text-xs text-stone">{ticket.name}</span>
                            <span className={`text-sm font-semibold ${ticket.isBooked ? 'text-accent' : (ticket.price.includes('免费') ? 'text-teal-600' : 'text-ink')}`}>
