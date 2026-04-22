@@ -67,8 +67,61 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 mb-12">
-         {/* AMap Real Rendering */}
-         <MapRenderer day={day} allLocations={allLocations} />
+         {/* Left Column: Map & Transports */}
+         <div className="flex flex-col gap-6 overflow-hidden">
+            {/* AMap Real Rendering */}
+            <MapRenderer day={day} allLocations={allLocations} />
+
+            {/* Transports (Horizontal Scroll) */}
+            {day.transports && day.transports.length > 0 && (
+               <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+                  <div className="text-xs font-bold tracking-widest uppercase text-stone mb-4">
+                     路线与交通指南
+                  </div>
+                  <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
+                     {day.transports.map((t: any, i: number) => {
+                         const best = t.options.find((o:any) => o.recommended) || t.options[0];
+                         const alternatives = t.options.filter((o:any) => o !== best);
+
+                         return (
+                            <div key={i} className="flex-none w-[300px] flex flex-col gap-3 p-4 bg-cream rounded-xl border border-border">
+                               <div className="font-bold text-ink text-sm truncate">{t.title}</div>
+                               
+                               <div className="flex flex-col gap-1.5">
+                                 <div className="text-[10px] text-stone font-bold tracking-wider uppercase">最优方案</div>
+                                 <div className="flex items-start gap-2 bg-white p-2.5 rounded-lg border border-accent/20 shadow-sm">
+                                     <span className="text-lg leading-none mt-0.5">{best.type === 'subway' ? '🚇' : (best.type==='walk' ? '🚶' : '🚗')}</span>
+                                     <div className="flex flex-col flex-1 min-w-0">
+                                        <span className="text-sm font-medium text-ink truncate">{best.desc}</span>
+                                        <div className="flex flex-wrap gap-1 mt-1.5">
+                                            {best.details.map((d: string, idx: number) => (
+                                                <span key={idx} className="text-[10px] text-stone bg-paper px-1.5 py-0.5 rounded border border-border/50">{d}</span>
+                                            ))}
+                                        </div>
+                                     </div>
+                                 </div>
+                               </div>
+
+                               {alternatives.length > 0 && (
+                                 <div className="flex flex-col gap-1.5 mt-auto pt-3 border-t border-border/50">
+                                   <div className="text-[10px] text-stone font-bold tracking-wider uppercase">次选方案</div>
+                                   {alternatives.map((alt: any, altIdx: number) => (
+                                     <div key={altIdx} className="flex items-center justify-between text-xs bg-white/50 p-2 rounded border border-border/50">
+                                         <span className="flex items-center gap-1.5 font-medium text-ink truncate mr-2">
+                                            {alt.type === 'subway' ? '🚇' : (alt.type==='walk' ? '🚶' : '🚗')} {alt.desc}
+                                         </span>
+                                         <span className="text-stone whitespace-nowrap">{alt.details[0]?.replace('⏱️', '').trim()}</span>
+                                     </div>
+                                   ))}
+                                 </div>
+                               )}
+                            </div>
+                         );
+                     })}
+                  </div>
+               </div>
+            )}
+         </div>
 
          {/* Sidebar: Timeline & Tickets */}
          <div className="flex flex-col gap-6">
@@ -84,32 +137,6 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
                   onLocationAdd={onLocationAdd}
                />
             </div>
-
-            {day.transports && day.transports.length > 0 && (
-               <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
-                  <div className="text-xs font-bold tracking-widest uppercase text-stone mb-4">
-                     交通建议 (Auto-Routed)
-                  </div>
-                  <div className="flex flex-col gap-4">
-                     {day.transports.map((t: any, i: number) => {
-                         const best = t.options.find((o:any) => o.recommended) || t.options[0];
-                         return (
-                            <div key={i} className="flex flex-col gap-2 p-3 bg-cream rounded-xl border border-border">
-                               <div className="text-xs font-bold text-stone">{t.title}</div>
-                               <div className="flex items-center gap-2 text-sm">
-                                  <span className="px-2 py-0.5 bg-white rounded border border-border">{best.type === 'subway' ? '🚇' : (best.type==='walk' ? '🚶' : '🚗')} {best.desc}</span>
-                               </div>
-                               <div className="flex flex-wrap gap-2 text-xs text-stone mt-1">
-                                  {best.details.map((d: string, idx: number) => (
-                                      <span key={idx}>{d}</span>
-                                  ))}
-                               </div>
-                            </div>
-                         );
-                     })}
-                  </div>
-               </div>
-            )}
 
             {day.tickets && day.tickets.length > 0 && (
                <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
