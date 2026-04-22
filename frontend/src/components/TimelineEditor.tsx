@@ -96,12 +96,14 @@ export function TimelineEditor({ items, isEditing, onSpotClick, onChange, onLoca
                         <div className="absolute -left-[30px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent ring-4 ring-white" />
                       {/* Content */}
                       <div className="flex-1">
-                        <div className="text-xs font-semibold text-stone tracking-wider mb-1">{item.time}</div>
+                        <div className="text-xs font-semibold text-stone tracking-wider mb-1">
+                          {index === items.length - 1 ? '抵达' : '出发'} {item.time}
+                        </div>
                         <div className={clsx(
                           "text-sm", 
-                          item.spot ? "text-accent underline decoration-dotted underline-offset-4 font-medium" : "text-ink"
+                          item.spot ? "text-accent underline decoration-dotted underline-offset-4 font-medium" : "text-ink font-medium"
                         )}>
-                          {item.event}
+                          {item.spot || item.event}
                         </div>
                       </div>
 
