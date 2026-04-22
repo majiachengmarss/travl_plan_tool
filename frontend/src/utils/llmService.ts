@@ -39,7 +39,14 @@ const SYSTEM_PROMPT = `你是一个资深的旅行规划算法。你的任务是
     "cityCode": "不需要填"
   },
   "locations": {}, // 留空对象，前端会通过高德API自动补齐
-  "spots": {}, // 留空对象
+  "spots": { // 请为你安排的核心景点生成游玩攻略
+    "景点名称": {
+      "tips": "避坑指南与注意事项",
+      "ticket": "门票价格及预约方式",
+      "hours": "开放时间",
+      "highlights": "必看亮点"
+    }
+  },
   "days": [
     {
       "id": "day0", // 第一天是 day0, 第二天是 day1...
@@ -141,7 +148,9 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
         });
     });
     tripData.locations = {};
-    tripData.spots = {};
+    if (!tripData.spots) {
+      tripData.spots = {};
+    }
 
     return tripData;
   } catch (parseError) {

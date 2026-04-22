@@ -73,6 +73,12 @@ export function CreateTripForm() {
             });
         }
 
+        // Run Auto-Scheduling Engine to calculate routes and timings
+        const { autoSchedule } = await import('../utils/scheduleEngine');
+        for (let i = 0; i < rawTripData.days.length; i++) {
+            rawTripData.days[i] = await autoSchedule(rawTripData.days[i], rawTripData.locations, rawTripData.spots || {});
+        }
+
         // Save generated itinerary to sessionStorage for ItineraryPage to pick up
         sessionStorage.setItem('local_trip_data', JSON.stringify(rawTripData));
 
