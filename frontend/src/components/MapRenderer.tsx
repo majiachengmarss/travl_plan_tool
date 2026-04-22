@@ -5,6 +5,7 @@ import { fetchRoutePoints } from '../utils/amap';
 interface MapRendererProps {
   day: DayPlan;
   allLocations: Record<string, [number, number]>;
+  activeTransportIndex?: number | null;
 }
 
 const routeColors: Record<string, string> = {
@@ -21,7 +22,7 @@ const routeDashArrays: Record<string, number[]> = {
   cruise: [8, 4]
 };
 
-export function MapRenderer({ day, allLocations }: MapRendererProps) {
+export function MapRenderer({ day, allLocations, activeTransportIndex }: MapRendererProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
 
@@ -99,8 +100,11 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
     const drawRoutes = async () => {
       if (!day.transports) return;
 
-      for (const transport of day.transports) {
+      for (let i = 0; i < day.transports.length; i++) {
          if (isCancelled) return;
+         if (activeTransportIndex !== null && activeTransportIndex !== undefined && activeTransportIndex !== i) continue;
+
+         const transport = day.transports[i];
          const bestOption = transport.options.find((o: any) => o.recommended) || transport.options[0];
          if (!bestOption) continue;
 
@@ -147,7 +151,7 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
     return () => {
       isCancelled = true;
     };
-  }, [day.transports, allLocations]); // Re-draw when transports change
+  }, [day.transports, allLocations, activeTransportIndex]); // Re-draw when transports or active state change
 
   return (
     <div className="relative bg-cream rounded-2xl overflow-hidden shadow-lg border border-border h-[550px]">

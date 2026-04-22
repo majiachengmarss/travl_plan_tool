@@ -18,6 +18,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
   const [isEditing, setIsEditing] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<string | null>(null);
+  const [activeTransportIndex, setActiveTransportIndex] = useState<number | null>(null);
 
   const handleTimelineChange = async (newTimeline: any[]) => {
     setIsScheduling(true);
@@ -25,6 +26,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
     try {
         const scheduledDay = await autoSchedule(updatedDay, allLocations, allSpots);
         onChange(scheduledDay);
+        setActiveTransportIndex(null); // Reset active transport on edit
     } catch (e) {
         console.error("Auto scheduling failed", e);
         onChange(updatedDay);
@@ -70,7 +72,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
          {/* Left Column: Map & Transports */}
          <div className="flex flex-col gap-6 overflow-hidden">
             {/* AMap Real Rendering */}
-            <MapRenderer day={day} allLocations={allLocations} />
+            <MapRenderer day={day} allLocations={allLocations} activeTransportIndex={activeTransportIndex} />
 
             {/* Transports (Horizontal Scroll) */}
             {day.transports && day.transports.length > 0 && (
@@ -82,9 +84,14 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
                      {day.transports.map((t: any, i: number) => {
                          const best = t.options.find((o:any) => o.recommended) || t.options[0];
                          const alternatives = t.options.filter((o:any) => o !== best);
+                         const isActive = activeTransportIndex === i;
 
                          return (
-                            <div key={i} className="flex-none w-[300px] flex flex-col gap-3 p-4 bg-cream rounded-xl border border-border">
+                            <div 
+                               key={i} 
+                               onClick={() => setActiveTransportIndex(isActive ? null : i)}
+                               className={`flex-none w-[300px] flex flex-col gap-3 p-4 bg-cream rounded-xl border transition-all cursor-pointer hover:shadow-md ${isActive ? 'border-accent ring-2 ring-accent/20' : 'border-border'}`}
+                            >
                                <div className="font-bold text-ink text-sm truncate">{t.title}</div>
                                
                                <div className="flex flex-col gap-1.5">
