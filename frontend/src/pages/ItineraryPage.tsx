@@ -16,21 +16,31 @@ export function ItineraryPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/itinerary/${id}`)
-        const data = await res.json()
+        let data;
+        if (id === 'local') {
+          const localData = sessionStorage.getItem('local_trip_data');
+          if (localData) {
+            data = JSON.parse(localData);
+          } else {
+            throw new Error("No local trip data found");
+          }
+        } else {
+          const res = await fetch(`/api/itinerary/${id}`);
+          data = await res.json();
+        }
         
         // Add unique IDs to timeline items for drag-and-drop
         data.days.forEach((day: any) => {
           day.timeline.forEach((item: any, idx: number) => {
-             item.id = `${day.id}-item-${idx}`;
+             if (!item.id) item.id = `${day.id}-item-${idx}`;
           });
         });
         
-        setTripData(data)
+        setTripData(data);
       } catch (err) {
-        console.error('Failed to load trip data', err)
+        console.error('Failed to load trip data', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
     fetchData()

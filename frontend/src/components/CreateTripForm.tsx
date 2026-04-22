@@ -33,12 +33,56 @@ export function CreateTripForm() {
     localStorage.setItem('ai_travel_api_key', apiKey);
     setIsGenerating(true);
 
-    // TODO: Phase 3 LLM Generation Logic goes here.
-    // For now, simulate loading and redirect to the Beijing demo
-    setTimeout(() => {
+    try {
+        const { generateItinerary } = await import('../utils/llmService');
+        const rawTripData = await generateItinerary({ city, days, vibe, hotels, events, apiKey, model });
+
+        // Phase 4: Geocoding Pipeline
+        // Collect all spots and events that need coordinates
+        const locationNames = new Set<string>();
+        rawTripData.days.forEach(d => {
+            d.timeline.forEach(item => {
+                if (item.spot) locationNames.add(item.spot);
+                if (item.event) locationNames.add(item.event);
+            });
+        });
+
+        // Fetch coordinates for each unique location
+        const locationsDict: Record<string, [number, number]> = {};
+        const geocodePromises = Array.from(locationNames).map(async (name) => {
+            try {
+                const res = await fetch(`/api/geocode?address=${encodeURIComponent(name)}&city=${encodeURIComponent(city)}`);
+                const geoData = await res.json();
+                if (geoData.location) {
+                    locationsDict[name] = geoData.location;
+                }
+            } catch(e) {
+                console.warn(`Geocode failed for ${name}`);
+            }
+        });
+
+        await Promise.all(geocodePromises);
+        rawTripData.locations = locationsDict;
+
+        // Set map centers based on found locations
+        const foundCoords = Object.values(locationsDict);
+        if (foundCoords.length > 0) {
+            const firstCoord = foundCoords[0];
+            rawTripData.days.forEach(d => {
+                d.mapCenter = firstCoord;
+            });
+        }
+
+        // Save generated itinerary to sessionStorage for ItineraryPage to pick up
+        sessionStorage.setItem('local_trip_data', JSON.stringify(rawTripData));
+
+        // Navigate to the newly generated trip
+        navigate('/itinerary?id=local');
+
+    } catch (error: any) {
+        alert("生成失败：" + error.message);
         setIsGenerating(false);
-        navigate('/itinerary?id=beijing');
-    }, 2000);
+    }
   };
 
   return (
