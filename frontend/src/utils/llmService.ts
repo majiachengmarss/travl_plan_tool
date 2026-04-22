@@ -15,6 +15,7 @@ const PROVIDER_URLS: Record<string, string> = {
   'deepseek-chat': 'https://api.deepseek.com/chat/completions',
   'glm-4': 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
   'moonshot-v1-8k': 'https://api.moonshot.cn/v1/chat/completions',
+  'mimo-v2-pro': 'https://api.xiaomimimo.com/v1/chat/completions',
 };
 
 const SYSTEM_PROMPT = `你是一个资深的旅行规划算法。你的任务是根据用户提供的目的地、游玩天数、主题偏好，以及用户已经确定好的酒店和固定事件（硬性约束），规划出一份完整且合理的逐日行程。

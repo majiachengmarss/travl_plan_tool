@@ -239,6 +239,7 @@ export function CreateTripForm() {
                                 <option value="deepseek-chat">DeepSeek (deepseek-chat)</option>
                                 <option value="glm-4">智谱清言 (glm-4)</option>
                                 <option value="moonshot-v1-8k">Kimi (moonshot-v1-8k)</option>
+                                <option value="mimo-v2-pro">小米 MiMo (mimo-v2-pro)</option>
                             </select>
                         </div>
                         <div>
