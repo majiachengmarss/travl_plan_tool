@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { DayPlan } from '../types';
+import { fetchRoutePoints } from '../utils/amap';
 
 interface MapRendererProps {
   day: DayPlan;
@@ -93,14 +94,31 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
     timelineLocs.forEach(loc => drawMarker(loc));
 
     // Draw routes directly from day.transports which are now pre-calculated by scheduleEngine
+    // If path is missing (like on initial load from static JSON), we fetch it on the fly
+    let isCancelled = false;
     const drawRoutes = async () => {
       if (!day.transports) return;
 
       for (const transport of day.transports) {
+         if (isCancelled) return;
          const bestOption = transport.options.find((o: any) => o.recommended) || transport.options[0];
-         if (!bestOption || !bestOption.path) continue;
+         if (!bestOption) continue;
 
-         const amapPath = bestOption.path.map((p: any) => new window.AMap.LngLat(p[0], p[1]));
+         let pathCoords = bestOption.path;
+
+         if (!pathCoords) {
+             const fromCoords = allLocations[bestOption.from];
+             const toCoords = allLocations[bestOption.to];
+             if (fromCoords && toCoords) {
+                 const res = await fetchRoutePoints(fromCoords, toCoords, bestOption.type);
+                 pathCoords = res.path;
+                 await new Promise(r => setTimeout(r, 150)); // rate limiting
+             }
+         }
+
+         if (!pathCoords || pathCoords.length === 0) continue;
+
+         const amapPath = pathCoords.map((p: any) => new window.AMap.LngLat(p[0], p[1]));
          const color = routeColors[bestOption.type] || '#f59e0b';
          const dashArray = routeDashArrays[bestOption.type] || [];
 
@@ -119,13 +137,15 @@ export function MapRenderer({ day, allLocations }: MapRendererProps) {
 
          map.add(polyline);
       }
-      map.setFitView();
+      if (!isCancelled) {
+          map.setFitView();
+      }
     };
 
     drawRoutes();
 
     return () => {
-      // Cleanup
+      isCancelled = true;
     };
   }, [day.transports, allLocations]); // Re-draw when transports change
 
