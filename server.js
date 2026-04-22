@@ -9,7 +9,8 @@ const AMAP_KEY = '166024ccfc790fbdddda3fb8c3de0027';
 // 天气 API 代理
 app.get('/api/weather', async (req, res) => {
     try {
-        const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=110000&key=${AMAP_KEY}`;
+        const key = req.query.amap_key || AMAP_KEY;
+        const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=110000&key=${key}`;
         const response = await fetch(url);
         const data = await response.json();
         res.json(data);
@@ -21,12 +22,13 @@ app.get('/api/weather', async (req, res) => {
 // 地理编码 API 代理 (将地名转换为经纬度)
 app.get('/api/geocode', async (req, res) => {
     try {
-        const { address, city } = req.query;
+        const { address, city, amap_key } = req.query;
+        const key = amap_key || AMAP_KEY;
         if (!address) {
             return res.status(400).json({ error: 'Address is required' });
         }
         
-        let url = `https://restapi.amap.com/v3/geocode/geo?address=${encodeURIComponent(address)}&key=${AMAP_KEY}`;
+        let url = `https://restapi.amap.com/v3/geocode/geo?address=${encodeURIComponent(address)}&key=${key}`;
         if (city) {
             url += `&city=${encodeURIComponent(city)}`;
         }
@@ -50,10 +52,11 @@ app.get('/api/geocode', async (req, res) => {
 app.get('/api/direction/:type', async (req, res) => {
     try {
         const { type } = req.params;
-        const { origin, destination, city } = req.query;
+        const { origin, destination, city, amap_key } = req.query;
+        const key = amap_key || AMAP_KEY;
         
         let apiType = type === 'subway' ? 'transit/integrated' : (type === 'walk' ? 'walking' : 'driving');
-        let url = `https://restapi.amap.com/v3/direction/${apiType}?origin=${origin}&destination=${destination}&key=${AMAP_KEY}`;
+        let url = `https://restapi.amap.com/v3/direction/${apiType}?origin=${origin}&destination=${destination}&key=${key}`;
         
         if (apiType === 'transit/integrated') {
             url += `&city=${city || '110000'}`;
