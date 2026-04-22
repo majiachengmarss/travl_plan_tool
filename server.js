@@ -6,9 +6,6 @@ const PORT = 3000;
 // 你的高德 Web 服务 API Key
 const AMAP_KEY = '166024ccfc790fbdddda3fb8c3de0027';
 
-// 托管前端构建文件
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
-
 // 天气 API 代理
 app.get('/api/weather', async (req, res) => {
     try {
@@ -18,6 +15,34 @@ app.get('/api/weather', async (req, res) => {
         res.json(data);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch weather' });
+    }
+});
+
+// 地理编码 API 代理 (将地名转换为经纬度)
+app.get('/api/geocode', async (req, res) => {
+    try {
+        const { address, city } = req.query;
+        if (!address) {
+            return res.status(400).json({ error: 'Address is required' });
+        }
+        
+        let url = `https://restapi.amap.com/v3/geocode/geo?address=${encodeURIComponent(address)}&key=${AMAP_KEY}`;
+        if (city) {
+            url += `&city=${encodeURIComponent(city)}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.status === '1' && data.geocodes && data.geocodes.length > 0) {
+            const locationStr = data.geocodes[0].location; // e.g. "116.481488,39.990464"
+            const [lng, lat] = locationStr.split(',').map(Number);
+            res.json({ location: [lng, lat] });
+        } else {
+            res.status(404).json({ error: 'Location not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch geocode' });
     }
 });
 
@@ -42,7 +67,6 @@ app.get('/api/direction/:type', async (req, res) => {
     }
 });
 
-
 // 静态数据接口
 app.get('/api/itinerary/:id', (req, res) => {
     const filePath = path.join(__dirname, 'data', `${req.params.id}.json`);
@@ -51,6 +75,10 @@ app.get('/api/itinerary/:id', (req, res) => {
     });
 });
 
+// 托管前端构建文件 (必须在所有 API 路由之后定义)
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
+// 单页应用 (SPA) Fallback
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
 });
