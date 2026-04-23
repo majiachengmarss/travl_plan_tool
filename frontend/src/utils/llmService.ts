@@ -122,6 +122,7 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.7,
+      max_tokens: 4096,
       response_format: config.model.includes('gpt') ? { type: "json_object" } : undefined
     })
   });
@@ -134,8 +135,15 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
   const data = await response.json();
   let contentStr = data.choices[0].message.content;
 
-  // Clean up markdown block if model ignored the instruction
-  contentStr = contentStr.replace(/```json/g, '').replace(/```/g, '').trim();
+  // Clean up markdown block and trailing text if model ignored the instruction
+  const startIdx = contentStr.indexOf('{');
+  const endIdx = contentStr.lastIndexOf('}');
+  
+  if (startIdx !== -1 && endIdx !== -1) {
+      contentStr = contentStr.substring(startIdx, endIdx + 1);
+  } else {
+      contentStr = contentStr.replace(/```json/g, '').replace(/```/g, '').trim();
+  }
 
   try {
     const tripData: TripData = JSON.parse(contentStr);
