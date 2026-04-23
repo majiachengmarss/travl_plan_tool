@@ -39,7 +39,7 @@ export function CreateTripForm() {
         if (step === 1) {
             const cityInputId = 'city-input';
             if (document.getElementById(cityInputId)) {
-                const auto = new window.AMap.AutoComplete({ input: cityInputId, datatype: 'city' });
+                const auto = new window.AMap.AutoComplete({ input: cityInputId });
                 auto.on("select", (e: any) => {
                     // Extract city name, preferably without "市" at the end if we want cleaner prompts, but either is fine.
                     let name = e.poi.name;
