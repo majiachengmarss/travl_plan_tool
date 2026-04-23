@@ -35,31 +35,48 @@ export function CreateTripForm() {
   };
 
   useEffect(() => {
-    if (step === 2 && window.AMap) {
-        // init autocomplete for all hotel inputs
-        hotels.forEach((_, i) => {
-            const inputId = `hotel-input-${i}`;
-            if (document.getElementById(inputId)) {
-                const auto = new window.AMap.AutoComplete({ input: inputId });
+    if (window.AMap) {
+        if (step === 1) {
+            const cityInputId = 'city-input';
+            if (document.getElementById(cityInputId)) {
+                const auto = new window.AMap.AutoComplete({ input: cityInputId, datatype: 'city' });
                 auto.on("select", (e: any) => {
-                    const newH = [...hotels];
-                    newH[i].name = e.poi.name;
-                    setHotels(newH);
+                    // Extract city name, preferably without "市" at the end if we want cleaner prompts, but either is fine.
+                    let name = e.poi.name;
+                    if (e.poi.adcode) {
+                        // often the name is accurate
+                        setCity(name);
+                    } else {
+                        setCity(name);
+                    }
                 });
             }
-        });
-        // init autocomplete for all event inputs
-        events.forEach((_, i) => {
-            const inputId = `event-input-${i}`;
-            if (document.getElementById(inputId)) {
-                const auto = new window.AMap.AutoComplete({ input: inputId });
-                auto.on("select", (e: any) => {
-                    const newEv = [...events];
-                    newEv[i].name = e.poi.name;
-                    setEvents(newEv);
-                });
-            }
-        });
+        } else if (step === 2) {
+            // init autocomplete for all hotel inputs
+            hotels.forEach((_, i) => {
+                const inputId = `hotel-input-${i}`;
+                if (document.getElementById(inputId)) {
+                    const auto = new window.AMap.AutoComplete({ input: inputId });
+                    auto.on("select", (e: any) => {
+                        const newH = [...hotels];
+                        newH[i].name = e.poi.name;
+                        setHotels(newH);
+                    });
+                }
+            });
+            // init autocomplete for all event inputs
+            events.forEach((_, i) => {
+                const inputId = `event-input-${i}`;
+                if (document.getElementById(inputId)) {
+                    const auto = new window.AMap.AutoComplete({ input: inputId });
+                    auto.on("select", (e: any) => {
+                        const newEv = [...events];
+                        newEv[i].name = e.poi.name;
+                        setEvents(newEv);
+                    });
+                }
+            });
+        }
     }
   }, [step, hotels.length, events.length]);
 
@@ -254,9 +271,10 @@ export function CreateTripForm() {
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-bold text-stone mb-2 uppercase tracking-wider">目的地城市</label>
-                                    <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="如：成都、上海、东京" className="w-full px-4 py-3 rounded-xl border border-border focus:ring-2 focus:ring-accent/50 focus:outline-none transition-shadow text-lg" />
+                                    <div className="relative">
+                                        <input id="city-input" type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="如：成都、上海、东京" className="w-full px-4 py-3 rounded-xl border border-border focus:ring-2 focus:ring-accent/50 focus:outline-none transition-shadow text-lg" />
+                                    </div>
                                 </div>
-
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-bold text-stone mb-2 uppercase tracking-wider">游玩天数</label>

@@ -33,14 +33,9 @@ export function MapRenderer({ day, allLocations, activeTransportIndex }: MapRend
     const map = new window.AMap.Map(mapContainer.current, {
       zoom: day.mapZoom || 13,
       center: day.mapCenter || [116.40, 39.90],
-      zooms: [11, 15],
+      zooms: [9, 18],
       mapStyle: 'amap://styles/light'
     });
-
-    map.setLimitBounds(new window.AMap.Bounds(
-      [115.4, 39.4],
-      [117.5, 41.1]
-    ));
 
     mapInstance.current = map;
 

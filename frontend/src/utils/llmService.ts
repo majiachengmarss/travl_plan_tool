@@ -39,7 +39,7 @@ const SYSTEM_PROMPT = `你是一个资深的旅行规划算法。你的任务是
     "cityCode": "不需要填"
   },
   "locations": {}, // 留空对象，前端会通过高德API自动补齐
-  "spots": { // 请为你安排的所有核心景点生成非常详细的游玩攻略
+  "spots": { // 【极其重要】：请只为你安排的核心“旅游景点”生成游玩攻略。对于“酒店”、“餐厅”、“车站”、“交通枢纽”等非旅游地点，绝对不要放在这里，留空即可！
     "景点名称": {
       "tips": "不少于50字的详细避坑指南与游玩注意事项",
       "ticket": "门票价格、免票政策及详细预约方式",
@@ -69,13 +69,13 @@ const SYSTEM_PROMPT = `你是一个资深的旅行规划算法。你的任务是
           "id": "day0-item-0",
           "time": "09:00",
           "event": "必须是纯粹的地名，例如：亚朵酒店春熙路店",
-          "spot": "必须是纯粹的地名，同上"
+          "spot": "" // 【重要】如果是酒店、餐厅、车站，spot字段必须设为空字符串！千万不要填！
         },
         {
           "id": "day0-item-1",
           "time": "09:30",
           "event": "武侯祠",
-          "spot": "武侯祠"
+          "spot": "武侯祠" // 只有真正的核心旅游景点才填入 spot 字段，且必须在上面的 spots 对象中有详细攻略对应！
         }
       ]
     }
@@ -146,9 +146,10 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
         day.transports = []; // Ensure empty array exists for the scheduling engine to fill
         day.timeline.forEach((item: any, idx: number) => {
             item.id = `${day.id}-item-${idx}`;
-            // If the model missed "spot" but provided "event", copy it over to trigger routing
-            if (!item.spot && item.event) {
-                item.spot = item.event;
+            // Intentionally not setting item.spot = item.event here anymore!
+            // We want non-spots (like hotels) to remain unclickable (black text).
+            if (item.spot === "" || item.spot === null) {
+                delete item.spot;
             }
         });
     });
