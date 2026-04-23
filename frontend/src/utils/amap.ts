@@ -28,7 +28,6 @@ export function generateBezierCurve(start: [number, number], end: [number, numbe
   }
   return points;
 }
-
 export async function fetchRoutePoints(
   from: [number, number],
   to: [number, number],
@@ -42,6 +41,16 @@ export async function fetchRoutePoints(
   let desc = '';
   let useBezier = false;
 
+  // Dynamically load settings to get user's custom AMap Web Key
+  const getSettings = () => {
+    try {
+        const saved = localStorage.getItem('app_settings');
+        return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  };
+  const settings = getSettings();
+  const amapParam = settings.amapWebKey ? `&amap_key=${settings.amapWebKey}` : '';
+
   if (type === 'cruise') {
     useBezier = true;
     durationMinutes = 30;
@@ -50,7 +59,7 @@ export async function fetchRoutePoints(
       const originStr = `${from[0]},${from[1]}`;
       const destStr = `${to[0]},${to[1]}`;
       let apiType = type === 'walk' ? 'walking' : type === 'subway' ? 'transit/integrated' : 'driving';
-      const url = `/api/direction/${type}?origin=${originStr}&destination=${destStr}`;
+      const url = `/api/direction/${type}?origin=${originStr}&destination=${destStr}${amapParam}`;
 
       const res = await fetch(url);
       const data = await res.json();

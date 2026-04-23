@@ -48,6 +48,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
         <SpotModal 
            spotName={selectedSpot} 
            spotData={allSpots[selectedSpot]} 
+           spotCenter={allLocations[selectedSpot]}
            onClose={() => setSelectedSpot(null)} 
         />
       )}

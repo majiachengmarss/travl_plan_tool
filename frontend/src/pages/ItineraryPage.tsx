@@ -17,17 +17,25 @@ export function ItineraryPage() {
     const fetchData = async () => {
       try {
         let data;
-        if (id === 'local') {
-          const localData = sessionStorage.getItem('local_trip_data');
-          if (localData) {
-            data = JSON.parse(localData);
-          } else {
-            throw new Error("No local trip data found");
-          }
-        } else {
+        
+        // 1. Try loading from storage utilities first (local/session)
+        const { loadTripData } = await import('../utils/storage');
+        const storedData = loadTripData(id);
+        
+        if (storedData) {
+          data = storedData;
+        } else if (id !== 'beijing' && id !== 'local') {
+          // 2. Try fetching from backend if not found in local storage
           const res = await fetch(`/api/itinerary/${id}`);
+          if (!res.ok) throw new Error("Backend itinerary not found");
+          data = await res.json();
+        } else if (id === 'beijing') {
+          // Special case for the built-in demo
+          const res = await fetch(`/api/itinerary/beijing`);
           data = await res.json();
         }
+        
+        if (!data) throw new Error("No data found for ID: " + id);
         
         // Add unique IDs to timeline items for drag-and-drop
         data.days.forEach((day: any) => {

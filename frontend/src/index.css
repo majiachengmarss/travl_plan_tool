@@ -30,4 +30,40 @@
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  @media print {
+    .no-print, button, nav, .spot-modal-close {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .day-section {
+        display: block !important;
+        page-break-after: always;
+        margin: 0 !important;
+        padding: 20mm !important;
+    }
+
+    .amap-container {
+        border: 1px solid #eee !important;
+        height: 120mm !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #eee !important;
+    }
+
+    header {
+        background: black !important;
+        color: white !important;
+        padding: 10mm !important;
+        -webkit-print-color-adjust: exact;
+    }
+  }
 }
