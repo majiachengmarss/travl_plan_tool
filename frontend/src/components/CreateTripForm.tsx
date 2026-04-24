@@ -41,14 +41,8 @@ export function CreateTripForm() {
             if (document.getElementById(cityInputId)) {
                 const auto = new window.AMap.AutoComplete({ input: cityInputId });
                 auto.on("select", (e: any) => {
-                    // Extract city name, preferably without "市" at the end if we want cleaner prompts, but either is fine.
                     let name = e.poi.name;
-                    if (e.poi.adcode) {
-                        // often the name is accurate
-                        setCity(name);
-                    } else {
-                        setCity(name);
-                    }
+                    setCity(name);
                 });
             }
         } else if (step === 2) {

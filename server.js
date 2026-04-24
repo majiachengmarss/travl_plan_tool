@@ -19,7 +19,7 @@ app.get('/api/weather', async (req, res) => {
     }
 });
 
-// 地理编码 API 代理 (将地名转换为经纬度)
+// POI 搜索 API 代理 (将地名转换为经纬度，替代原先不精确的地理编码)
 app.get('/api/geocode', async (req, res) => {
     try {
         const { address, city, amap_key } = req.query;
@@ -28,7 +28,7 @@ app.get('/api/geocode', async (req, res) => {
             return res.status(400).json({ error: 'Address is required' });
         }
         
-        let url = `https://restapi.amap.com/v3/geocode/geo?address=${encodeURIComponent(address)}&key=${key}`;
+        let url = `https://restapi.amap.com/v3/place/text?keywords=${encodeURIComponent(address)}&key=${key}&citylimit=true`;
         if (city) {
             url += `&city=${encodeURIComponent(city)}`;
         }
@@ -36,8 +36,11 @@ app.get('/api/geocode', async (req, res) => {
         const response = await fetch(url);
         const data = await response.json();
         
-        if (data.status === '1' && data.geocodes && data.geocodes.length > 0) {
-            const locationStr = data.geocodes[0].location; // e.g. "116.481488,39.990464"
+        if (data.status === '1' && data.pois && data.pois.length > 0) {
+            const locationStr = data.pois[0].location; // e.g. "116.481488,39.990464"
+            if (!locationStr || locationStr.length === 0) {
+                return res.status(404).json({ error: 'Location coordinates missing' });
+            }
             const [lng, lat] = locationStr.split(',').map(Number);
             res.json({ location: [lng, lat] });
         } else {
