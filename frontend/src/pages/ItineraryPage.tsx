@@ -67,9 +67,10 @@ export function ItineraryPage() {
       <Header meta={tripData.meta} />
       <DayNav days={tripData.days} activeIdx={activeDayIdx} onChange={setActiveDayIdx} />
       
-      <main className="max-w-[1400px] mx-auto p-8">
+      <main className="max-w-[1400px] mx-auto p-8 no-print">
          <DayView 
             day={tripData.days[activeDayIdx]} 
+            cityStr={tripData.meta.city}
             allLocations={tripData.locations}
             allSpots={tripData.spots || {}}
             onChange={(updatedDay) => {

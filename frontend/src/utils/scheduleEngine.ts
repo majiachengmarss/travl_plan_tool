@@ -15,7 +15,8 @@ function formatTime(mins: number): string {
 export async function autoSchedule(
     day: DayPlan,
     allLocations: Record<string, [number, number]>,
-    allSpots: Record<string, any>
+    allSpots: Record<string, any>,
+    cityStr?: string
 ): Promise<DayPlan> {
     if (day.timeline.length === 0) return day;
 
@@ -67,7 +68,7 @@ export async function autoSchedule(
 
         // Fetch transport options
         try {
-            const options = await fetchTransportOptions(fromLoc.name, toLoc.name, fromCoords, toCoords);
+            const options = await fetchTransportOptions(fromLoc.name, toLoc.name, fromCoords, toCoords, cityStr);
             if (options.length > 0) {
                 const bestOption = options.find(o => o.recommended) || options[0];
                 // Extract duration from detail string (e.g. "⏱️ 20分钟" or "⏱️ 约20分钟")

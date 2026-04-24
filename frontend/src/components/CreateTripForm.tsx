@@ -133,7 +133,7 @@ export function CreateTripForm() {
         (window as any).__AMAP_WEB_KEY__ = settings.amapWebKey;
 
         for (let i = 0; i < rawTripData.days.length; i++) {
-            rawTripData.days[i] = await autoSchedule(rawTripData.days[i], rawTripData.locations, rawTripData.spots || {});
+            rawTripData.days[i] = await autoSchedule(rawTripData.days[i], rawTripData.locations, rawTripData.spots || {}, city);
         }
 
         // Persist using unique ID

@@ -31,7 +31,8 @@ export function generateBezierCurve(start: [number, number], end: [number, numbe
 export async function fetchRoutePoints(
   from: [number, number],
   to: [number, number],
-  type: string
+  type: string,
+  cityStr?: string
 ): Promise<{ path: [number, number][]; distanceText: string; durationText: string; durationMinutes: number; priceText?: string; desc?: string; useBezier: boolean }> {
   let path: [number, number][] = [];
   let distText = '';
@@ -49,7 +50,10 @@ export async function fetchRoutePoints(
     } catch { return {}; }
   };
   const settings = getSettings();
-  const amapParam = settings.amapWebKey ? `&amap_key=${settings.amapWebKey}` : '';
+  let amapParam = settings.amapWebKey ? `&amap_key=${settings.amapWebKey}` : '';
+  if (cityStr) {
+      amapParam += `&city=${encodeURIComponent(cityStr)}`;
+  }
 
   if (type === 'cruise') {
     useBezier = true;
@@ -75,24 +79,30 @@ export async function fetchRoutePoints(
           priceText = (transit.cost || '4') + '元';
           
           let segmentsNames: string[] = [];
-          transit.segments.forEach((segment: any) => {
-            if (segment.walking && segment.walking.steps) {
-              segment.walking.steps.forEach((step: any) => {
-                step.polyline.split(';').forEach((point: string) => {
-                  const pts = point.split(',');
-                  path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+          if (transit.segments) {
+            transit.segments.forEach((segment: any) => {
+              if (segment.walking && segment.walking.steps) {
+                segment.walking.steps.forEach((step: any) => {
+                  if (step.polyline) {
+                    step.polyline.split(';').forEach((point: string) => {
+                      const pts = point.split(',');
+                      path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+                    });
+                  }
                 });
-              });
-            }
-            if (segment.bus && segment.bus.buslines && segment.bus.buslines.length > 0) {
-              const busline = segment.bus.buslines[0];
-              segmentsNames.push(busline.name.split('(')[0]);
-              busline.polyline.split(';').forEach((point: string) => {
-                const pts = point.split(',');
-                path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
-              });
-            }
-          });
+              }
+              if (segment.bus && segment.bus.buslines && segment.bus.buslines.length > 0) {
+                const busline = segment.bus.buslines[0];
+                segmentsNames.push(busline.name.split('(')[0]);
+                if (busline.polyline) {
+                  busline.polyline.split(';').forEach((point: string) => {
+                    const pts = point.split(',');
+                    path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+                  });
+                }
+              }
+            });
+          }
           desc = segmentsNames.join('→') || '公交/地铁路线';
         } else if (data.route.paths && data.route.paths.length > 0) {
           const bestPath = data.route.paths[0];
@@ -105,12 +115,16 @@ export async function fetchRoutePoints(
              priceText = '约' + Math.max(13, Math.ceil(distance/1000 * 3)) + '元';
           }
 
-          bestPath.steps.forEach((step: any) => {
-            step.polyline.split(';').forEach((point: string) => {
-              const pts = point.split(',');
-              path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+          if (bestPath.steps) {
+            bestPath.steps.forEach((step: any) => {
+              if (step.polyline) {
+                step.polyline.split(';').forEach((point: string) => {
+                  const pts = point.split(',');
+                  path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+                });
+              }
             });
-          });
+          }
         }
       } else {
         // Fallback for transit if no route found
@@ -124,12 +138,16 @@ export async function fetchRoutePoints(
             durationMinutes = Math.ceil(duration / 60);
             durText = durationMinutes + '分钟';
             desc = '距离较近，建议步行';
-            bestPath.steps.forEach((step: any) => {
-              step.polyline.split(';').forEach((point: string) => {
-                const pts = point.split(',');
-                path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+            if (bestPath.steps) {
+              bestPath.steps.forEach((step: any) => {
+                if (step.polyline) {
+                  step.polyline.split(';').forEach((point: string) => {
+                    const pts = point.split(',');
+                    path.push([parseFloat(pts[0]), parseFloat(pts[1])]);
+                  });
+                }
               });
-            });
+            }
           } else {
             useBezier = true;
           }
@@ -152,14 +170,14 @@ export async function fetchRoutePoints(
   return { path, distanceText: distText, durationText: durText, durationMinutes, priceText, desc, useBezier };
 }
 
-export async function fetchTransportOptions(fromName: string, toName: string, fromCoords: [number, number], toCoords: [number, number]) {
+export async function fetchTransportOptions(fromName: string, toName: string, fromCoords: [number, number], toCoords: [number, number], cityStr?: string) {
     const idPrefix = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
     const options = [];
     
     // Default: try fetching taxi and subway concurrently
     const [subwayRes, taxiRes] = await Promise.all([
-       fetchRoutePoints(fromCoords, toCoords, 'subway'),
-       fetchRoutePoints(fromCoords, toCoords, 'taxi')
+       fetchRoutePoints(fromCoords, toCoords, 'subway', cityStr),
+       fetchRoutePoints(fromCoords, toCoords, 'taxi', cityStr)
     ]);
     
     // Construct Subway Option

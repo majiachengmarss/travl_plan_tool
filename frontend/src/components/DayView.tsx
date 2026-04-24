@@ -8,13 +8,14 @@ import { autoSchedule } from '../utils/scheduleEngine';
 
 interface DayViewProps {
   day: DayPlan;
+  cityStr?: string;
   allLocations: Record<string, [number, number]>;
   allSpots: Record<string, any>;
   onChange: (updatedDay: DayPlan) => void;
   onLocationAdd: (name: string, coords: [number, number]) => void;
 }
 
-export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }: DayViewProps) {
+export function DayView({ day, cityStr, allLocations, allSpots, onChange, onLocationAdd }: DayViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export function DayView({ day, allLocations, allSpots, onChange, onLocationAdd }
     setIsScheduling(true);
     const updatedDay = { ...day, timeline: newTimeline };
     try {
-        const scheduledDay = await autoSchedule(updatedDay, allLocations, allSpots);
+        const scheduledDay = await autoSchedule(updatedDay, allLocations, allSpots, cityStr);
         onChange(scheduledDay);
         setActiveTransportIndex(null); // Reset active transport on edit
     } catch (e) {
