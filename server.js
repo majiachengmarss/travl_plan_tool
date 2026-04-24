@@ -82,10 +82,21 @@ app.get('/api/itinerary/:id', (req, res) => {
 });
 
 // 托管前端构建文件 (必须在所有 API 路由之后定义)
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+app.use(express.static(path.join(__dirname, 'frontend/dist'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
+    }
+}));
 
 // 单页应用 (SPA) Fallback
 app.use((req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
 });
 

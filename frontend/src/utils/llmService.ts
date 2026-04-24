@@ -149,9 +149,16 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
     const tripData: TripData = JSON.parse(contentStr);
     
     // Auto-fill some essential structural fields just in case
+    if (!tripData.days || !Array.isArray(tripData.days)) {
+        throw new Error("Missing 'days' array in JSON");
+    }
+
     tripData.days.forEach((day: any, i: number) => {
         day.id = `day${i}`;
         day.transports = []; // Ensure empty array exists for the scheduling engine to fill
+        if (!day.timeline || !Array.isArray(day.timeline)) {
+            day.timeline = []; // fallback
+        }
         day.timeline.forEach((item: any, idx: number) => {
             item.id = `${day.id}-item-${idx}`;
             // Intentionally not setting item.spot = item.event here anymore!
@@ -167,8 +174,9 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
     }
 
     return tripData;
-  } catch (parseError) {
+  } catch (parseError: any) {
+    console.error("Parse or Structuring Error:", parseError);
     console.error("Raw LLM output was:", contentStr);
-    throw new Error("模型返回的 JSON 格式不合法，请重试");
+    throw new Error(`JSON 解析或结构错误: ${parseError.message}`);
   }
 }
