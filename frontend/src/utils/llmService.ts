@@ -145,6 +145,9 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
       contentStr = contentStr.replace(/```json/g, '').replace(/```/g, '').trim();
   }
 
+  // 修复部分大模型（如 MiMo）在 JSON 中误用中文引号的情况
+  contentStr = contentStr.replace(/“/g, '"').replace(/”/g, '"');
+
   try {
     const tripData: TripData = JSON.parse(contentStr);
     
