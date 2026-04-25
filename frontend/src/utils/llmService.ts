@@ -1,4 +1,5 @@
 import type { TripData } from '../types';
+import { jsonrepair } from 'jsonrepair';
 
 export interface GenerateConfig {
   city: string;
@@ -137,19 +138,18 @@ export async function generateItinerary(config: GenerateConfig): Promise<TripDat
 
   // Clean up markdown block and trailing text if model ignored the instruction
   const startIdx = contentStr.indexOf('{');
-  const endIdx = contentStr.lastIndexOf('}');
-  
-  if (startIdx !== -1 && endIdx !== -1) {
-      contentStr = contentStr.substring(startIdx, endIdx + 1);
-  } else {
-      contentStr = contentStr.replace(/```json/g, '').replace(/```/g, '').trim();
+  if (startIdx !== -1) {
+      contentStr = contentStr.substring(startIdx);
   }
+  contentStr = contentStr.replace(/```json/g, '').replace(/```/g, '').trim();
 
   // 修复部分大模型（如 MiMo）在 JSON 中误用中文引号的情况
   contentStr = contentStr.replace(/“/g, '"').replace(/”/g, '"');
 
   try {
-    const tripData: TripData = JSON.parse(contentStr);
+    // 自动修复截断或格式损坏的 JSON
+    const repairedJsonStr = jsonrepair(contentStr);
+    const tripData: TripData = JSON.parse(repairedJsonStr);
     
     // Auto-fill some essential structural fields just in case
     if (!tripData.days || !Array.isArray(tripData.days)) {
